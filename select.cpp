@@ -3,17 +3,9 @@ using namespace std;
 #include <cstdlib>
 #include "io.h"
 #include "parseTree.h"
+#include "common.h"
 void selSublist(node *);
-void tableName(node *parent){
-  node *tableNameNode, *tblNode;
-  tableNameNode = new node("tableName", false);
-  parent->subTree.push_back(tableNameNode);
-  char *word = (char*)malloc(10*sizeof(char));
-  read(word, false);
-  tblNode = new node(word, true);
-  tableNameNode->subTree.push_back(tblNode);
-  return;
-}
+
 void tablelist(node *parent){
   //create non-terminal table-list node
   node *tablelistNode, *commaNode;

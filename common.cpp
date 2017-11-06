@@ -7,6 +7,18 @@ using namespace std;
 #include "parseTree.h"
 
 const int WIDTH = 20;
+
+
+void tableName(node *parent){
+  node *tableNameNode, *tblNode;
+  tableNameNode = new node("tableName", false);
+  parent->subTree.push_back(tableNameNode);
+  char *word = (char*)malloc(10*sizeof(char));
+  read(word, false);
+  tblNode = new node(word, true);
+  tableNameNode->subTree.push_back(tblNode);
+  return;
+}
 void printTree(node* curr, int indent) {
     bool isTermNode;
     isTermNode = curr->isTermNode;
