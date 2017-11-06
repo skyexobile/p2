@@ -1,21 +1,26 @@
 #include "common.h"
 #include <string>
 #include<iostream>
+#include<iomanip>
+using namespace std;
 #include<vector>
-void printTree(node* curr) {
-    string termStr;
-    termStr = curr -> termString;
-    if (!termStr.empty()) {
+#include "parseTree.h"
+
+const int WIDTH = 20;
+void printTree(node* curr, int indent) {
+    bool isTermNode;
+    isTermNode = curr->isTermNode;
+    if (isTermNode) {
         // terminal node
-        cout << termStr << '\t';
+        cout << setw(WIDTH*indent) << curr->nodeName << endl;
         return;
     } else {
         // non-terminal node
+        cout << setw(WIDTH*indent) << curr->nodeName << endl;
         vector<node *> vectChildNodes;
         vectChildNodes = curr -> subTree;
         for (auto& nodeptr:vectChildNodes) {
-            cout << nodeptr << endl;
-            printTree(nodeptr);
+            printTree(nodeptr, indent+1);
         }
         return;
     }

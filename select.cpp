@@ -6,18 +6,18 @@ using namespace std;
 void selSublist(node *);
 void tableName(node *parent){
   node *tableNameNode, *tblNode;
-  tableNameNode = new node();
+  tableNameNode = new node("tableName", false);
   parent->subTree.push_back(tableNameNode);
   char *word = (char*)malloc(10*sizeof(char));
   read(word, false);
-  tblNode = new node(word);
+  tblNode = new node(word, true);
   tableNameNode->subTree.push_back(tblNode);
   return;
 }
 void tablelist(node *parent){
   //create non-terminal table-list node
   node *tablelistNode, *commaNode;
-  tablelistNode = new node();
+  tablelistNode = new node("tablelist", false);
   parent->subTree.push_back(tablelistNode);
   tableName(tablelistNode);
   //check if there is a comma ahead
@@ -27,7 +27,7 @@ void tablelist(node *parent){
     return;
   }
   else if (comBuf != nullptr) {
-      commaNode = new node(",");
+      commaNode = new node(",", true);
       tablelistNode-> subTree.push_back(commaNode);
       tablelist(tablelistNode);
   }
@@ -37,63 +37,73 @@ void tablelist(node *parent){
 
 void columnName(node *parent){
     node *colNameNode, *commaNode;
-    colNameNode = new node();
+    bool flgComma = false;
+    colNameNode = new node("colName", false);
     parent->subTree.push_back(colNameNode);
-    char *temp;
-    temp = (char *)malloc(20*sizeof(char));
+    char *temp, *attrName;
+    temp, attrName = (char *)malloc(40*sizeof(char));
     read(temp, false);
+    strcpy(attrName, temp);
+    if(read(temp, true) != nullptr){
+      //we have read either a . or ,
+      if(temp[0] == "."){
+        strcat(attrName, temp);
+        read(temp, false);
+        strcat(attrName, temp);
+      }
+      else if(temp[0] == ","){
+        flgComma = true;
+      }
+
     node *atrNameNode;
-    atrNameNode = new node(temp);
+    atrNameNode = new node(attrName, true);
     colNameNode -> subTree.push_back(atrNameNode);
-    char *comBuf = (char *)malloc(3*sizeof(char));
-    read(comBuf, true);
-    if(comBuf[0] ==  '\0'){
-      return;
-    }
-    else if (comBuf != nullptr) {
-        commaNode = new node(",");
+    if(flgComma){
+        commaNode = new node(",", true);
         parent -> subTree.push_back(commaNode);
+        selSublist(parent);
     }
-    read(temp, false);
-    if(strcmp(temp,"FROM") == 0){
 
-      for(int i =(strlen(temp)-1); i>=0; i--){
-        putChar(temp[i]);
-        return;
-      }
-    }
-    else{
-      putChar(' ');
-      for( int i =(strlen(temp)-1); i>=0; i--){
-        putChar(temp[i]);
-      }
-
-      selSublist(parent);
-    }
     return;
 }
 
 void selSublist(node *parent) {
   cout << "selSublist" << endl;
+
     node *selSublistNode, *commaNode;
     char *temp;
     temp = (char *)malloc(20*sizeof(char));
-    selSublistNode = new node();
+    selSublistNode = new node("selSublist", false);
     parent -> subTree.push_back(selSublistNode);
     columnName(selSublistNode);
+    read(temp, true);
+    if(strcmp(temp, ",") ==0){
+      commaNode = new node(",", true);
+      parent->subTree.push_back(commaNode);
+      selSublist(selSublistNode);
+    }
+    else{
+      read(temp, false);
+      if(strcmp(temp,"FROM") == 0){
 
+        for(int i =(strlen(temp)-1); i>=0; i--){
+          putChar(temp[i]);
+          return;
+        }
+      }
+    }
     return;
 }
 
 void selList(node *parent) {
   cout << "selList " << endl;
     node *selListNode, *starNode;
-    selListNode = new node();
+    selListNode = new node("selList", false);
     parent -> subTree.push_back(selListNode);
     char* c= (char *)malloc(3*sizeof(char));
     read(c, true);
     if(strcmp(c, "*") == 0){
-      starNode = new node("*");
+      starNode = new node("*", true);
       parent->subTree.push_back(starNode);
     }
     else{

@@ -3,6 +3,6 @@
 
 #include "parseTree.h"
 
-void printTree(node *curr);
+void printTree(node *curr, int indent);
 
 #endif
