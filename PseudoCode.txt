@@ -1,0 +1,50 @@
+select course, uin from students
+
+//check for syntax error-- caught by read
+//parser
+buf = malloc(20)
+//parser calls read, checks to see what first word is.
+//first time expects a word and checks if it's getting word.
+//check in buffer to see if it's correct.. check syntax rules to see which subroutine to call
+//call subroutine
+
+//Scanner will be called "read"
+char read(char c){
+//call getChar() if there's whitespace before start of word, ignore it
+//
+//will read from raw input
+//read one character after word, will need to put it back into input stream
+//check ascii range to see if letter or digit
+
+//call getChar() once
+//switch case-- if it's , . '' then put it in sbuf return
+//switch case--if it IS letter or digit, put it in buf
+//end switch case
+//now we know we read a letter and it's in buffer
+//Loop:  
+    //call getChar()
+    //if it is not a letter or digit, this means that we are at the end of the word, so put the read character in buf and return
+    //else  store it in sbuf
+//return
+
+//check for new line character??
+}
+putChar(){
+//if buffer is full, return error
+//put character in buffer
+}
+getChar(){
+//check if buffer of 1 character is full
+//return character and empty buffer it is
+//if empty, call cin
+
+}
+string Word(){
+//call getChar
+//check if not . , ''
+
+//put character in buf
+}
+
+//For subroutine
+//check buffer and then act according to syntax rules
