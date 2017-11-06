@@ -4,12 +4,13 @@ using namespace std;
 #include <cstring>
 #include "io.h"
 //#include "common.h"
+#include "insert.h"
 #include "select.h"
 #include "parseTree.h"
 
 int main() {
     node *root;
-    root = new node();
+    root = new node("ParserRoot", false);
     /* read the first word to check the type of statement */
     char *stmtBuf;
     stmtBuf = (char *)malloc(10*sizeof(char));
@@ -20,7 +21,7 @@ int main() {
     if (strcmp(stmtBuf, "SELECT") == 0) {
        selectStmt(root);
 
-    cout << "print select: " << root->subTree[0]->termString <<endl;
+  //  cout << "print select: " << root->subTree[0]->termString <<endl;
       // cout << "print DISTINCT: " << root->subTree[1]->termString <<endl;
   //     cout << "print star" << root->subTree[1]->subTree[0]->termString <<endl;
   //   cout << "select col print: " << root->subTree[1]->subTree[0]->subTree[0]->subTree[0]->termString << endl;
@@ -31,7 +32,7 @@ int main() {
  //cout << "from tablename print" << root->subTree[3]->subTree[2]->subTree[0]->subTree[0]->termString << endl;
 
     }
-    else if (strmp(stmtBuf, "INSERT") == 0){
+    else if (strcmp(stmtBuf, "INSERT") == 0){
       insertStmt(root);
     }
 }

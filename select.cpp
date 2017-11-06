@@ -41,19 +41,22 @@ void columnName(node *parent){
     colNameNode = new node("colName", false);
     parent->subTree.push_back(colNameNode);
     char *temp, *attrName;
-    temp, attrName = (char *)malloc(40*sizeof(char));
+    attrName = (char *)malloc(40*sizeof(char));
+    temp = (char *)malloc(3*sizeof(char));
     read(temp, false);
     strcpy(attrName, temp);
-    if(read(temp, true) != nullptr){
+    read(temp, true);
+    if(temp != nullptr){
       //we have read either a . or ,
-      if(temp[0] == "."){
+      if(strcmp(temp, "." ) == 0){
         strcat(attrName, temp);
         read(temp, false);
         strcat(attrName, temp);
       }
-      else if(temp[0] == ","){
+      else if(strcmp(temp, ",") ==0){
         flgComma = true;
       }
+    }
 
     node *atrNameNode;
     atrNameNode = new node(attrName, true);
@@ -117,7 +120,7 @@ void selList(node *parent) {
 void selectStmt(node *parent) {
     cout << "in selectStmt" << endl;
     node *selNode, *dNode, *fromNode;
-    selNode = new node("SELECT");
+    selNode = new node("SELECT", true);
     parent -> subTree.push_back(selNode);
     //check distinct
     char* c= (char *)malloc(10*sizeof(char));
@@ -129,7 +132,7 @@ void selectStmt(node *parent) {
       read(c, false);
 
     if(strcmp(c, "DISTINCT") ==0){
-      dNode = new node("DISTINCT");
+      dNode = new node("DISTINCT", true);
       parent->subTree.push_back(dNode);
 }
     else{
@@ -145,7 +148,7 @@ void selectStmt(node *parent) {
     //check for "FROM"
     read(c, false);
     if(strcmp(c, "FROM") == 0){
-      fromNode = new node("FROM");
+      fromNode = new node("FROM", true);
       parent->subTree.push_back(fromNode);
       tablelist(parent);
     }

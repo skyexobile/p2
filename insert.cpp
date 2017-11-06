@@ -3,7 +3,7 @@ using namespace std;
 #include <cstdlib>
 #include "io.h"
 #include "parseTree.h"
-
+#include "select.h"
 
 void value(node* parent){
   node* valueNode, *value;
@@ -25,13 +25,13 @@ void valueList(node* parent){
   char *temp;
   temp = (char *)malloc(20*sizeof(char));
   read(temp, true);
-  if(temp[0] == ","){
+  if(strcmp(temp, ",") ==0){
     commaNode = new node(",", true);
     valuelistNode -> subTree.push_back(commaNode);
-    valueList(valueListNode);
+    valueList(valuelistNode);
   }
-  else if(temp[0] == ")"){
-    putChar(temp);
+  else if(strcmp(temp,")") == 0){
+    putChar(')');
   }
   return;
 }
@@ -54,12 +54,12 @@ void insertTuples(node* parent){
     {
       read(temp, true);
     }
-    if(temp[0] == "("){
+    if(strcmp(temp, "(") == 0){
       LPNode = new node("(", true);
       parent->subTree.push_back(LPNode);
-      valuelist(insertTuplesNode);
+      valueList(insertTuplesNode);
     }
-    if(temp[0] == ")"){
+    if(strcmp(temp, ")" )== 0){
       RPNode = new node(")", true);
       parent->subTree.push_back(RPNode);
     }
@@ -69,7 +69,7 @@ void insertTuples(node* parent){
 
 }
 
-
+void attrList(node*);
 void attrName(node *parent){
     node *attrNameNode, *commaNode;
     attrNameNode = new node("attrName", false);
@@ -81,11 +81,11 @@ void attrName(node *parent){
     atrName = new node(temp, true);
     attrNameNode -> subTree.push_back(atrName);
     read(temp, true);
-    if(temp[0] ==  ')'){
-      putchar(temp[0]);
+    if(strcmp(temp, ")") == 0){
+      putChar(')');
       return;
     }
-    else if (temp[0] == ",") {
+    else if (strcmp(temp, ",") ==0){
         commaNode = new node(",", true);
         parent -> subTree.push_back(commaNode);
         attrList(parent);
@@ -98,7 +98,7 @@ void attrList(node *parent) {
     node *attrListNode, *commaNode;
     char *temp;
     temp = (char *)malloc(20*sizeof(char));
-    attrListtNode = new node("attrList", false);
+    attrListNode = new node("attrList", false);
     parent -> subTree.push_back(attrListNode);
     attrName(attrListNode);
 
