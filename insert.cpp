@@ -110,12 +110,7 @@ void insertTable(node *parent) {
   cout << "tableName " << endl;
     node *tblNameNode, *tblName, *LPNode, *RPNode;
 
-    tblNameNode = new node("tableName", false);
-    parent -> subTree.push_back(tblNameNode);
-    char* c= (char *)malloc(20*sizeof(char));
-    read(c, false);
-    tblName = new node(c, true);
-    parent->subTree.push_back(tblName);
+    tableName(parent);
 
     read(c, true);
     if(c[0] == '\0'){
