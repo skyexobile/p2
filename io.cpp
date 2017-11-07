@@ -51,6 +51,9 @@ void read(char *sbuf, bool oneChar) {
         case '\n':
         case '(':
         case ')':
+        case '<':
+        case '>':
+        case '=':
             cout << "DETECTED A CHARACTER " << endl;
             sbuf[0] = c;
             sbuf[1] = '\0';
