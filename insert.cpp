@@ -4,6 +4,7 @@ using namespace std;
 #include "io.h"
 #include "parseTree.h"
 #include "select.h"
+#include "common.h"
 
 void value(node* parent){
   node* valueNode, *value;
@@ -111,7 +112,8 @@ void insertTable(node *parent) {
     node *tblNameNode, *tblName, *LPNode, *RPNode;
 
     tableName(parent);
-
+    char *c;
+    c = (char *)malloc(20*sizeof(char));
     read(c, true);
     if(c[0] == '\0'){
       read(c,true);
