@@ -1,6 +1,7 @@
 #include <iostream>
 using namespace std;
 #include <cstdlib>
+#include <cstring>
 #include "io.h"
 #include "parseTree.h"
 #include "common.h"
@@ -54,9 +55,7 @@ void columnName(node *parent){
     atrNameNode = new node(attrName, true);
     colNameNode -> subTree.push_back(atrNameNode);
     if(flgComma){
-        commaNode = new node(",", true);
-        parent -> subTree.push_back(commaNode);
-        selSublist(parent);
+        putChar(',');
     }
 
     return;
@@ -74,19 +73,20 @@ void selSublist(node *parent) {
     read(temp, true);
     if(strcmp(temp, ",") ==0){
       commaNode = new node(",", true);
-      parent->subTree.push_back(commaNode);
+      selSublistNode->subTree.push_back(commaNode);
       selSublist(selSublistNode);
     }
-    else{
+  /*  else{
       read(temp, false);
       if(strcmp(temp,"FROM") == 0){
 
+            putChar(' ');
         for(int i =(strlen(temp)-1); i>=0; i--){
           putChar(temp[i]);
-          return;
         }
+          return;
       }
-    }
+    }*/
     return;
 }
 
@@ -114,35 +114,39 @@ void selectStmt(node *parent) {
     node *selNode, *dNode, *fromNode;
     selNode = new node("SELECT", true);
     parent -> subTree.push_back(selNode);
+    cout << "parent of selNode: " << parent;
     //check distinct
     char* c= (char *)malloc(10*sizeof(char));
     read(c, true);
     if(strcmp(c,"*")==0){
-      selList(parent);
+        selList(parent);
+        putChar('*');
     }
     else{
-      read(c, false);
+        read(c, false);
 
-    if(strcmp(c, "DISTINCT") ==0){
-      dNode = new node("DISTINCT", true);
-      parent->subTree.push_back(dNode);
-}
-    else{
+        if(strcmp(c, "DISTINCT") ==0){
+            dNode = new node("DISTINCT", true);
+            parent->subTree.push_back(dNode);
+        }
+        else{
 
-      for(int i =(strlen(c)-1); i>=0; i--){
-        putChar(c[i]);
-      }
+            putChar(' ');
+            for(int i =(strlen(c)-1); i>=0; i--){
+                putChar(c[i]);
+            }
+        }
+        selList(parent);
+
     }
-    selList(parent);
-
-}
 
     //check for "FROM"
     read(c, false);
     if(strcmp(c, "FROM") == 0){
-      fromNode = new node("FROM", true);
-      parent->subTree.push_back(fromNode);
-      tablelist(parent);
+        fromNode = new node("FROM", true);
+        parent->subTree.push_back(fromNode);
+        cout << "parent of fromNode: " << parent;
+        tablelist(parent);
     }
     else{
     }
