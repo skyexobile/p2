@@ -4,13 +4,13 @@ using namespace std;
 #include <cstring>
 #include "io.h"
 #include "common.h"
-#include "insert.h"
 #include "select.h"
+#include "insert.h"
 #include "parseTree.h"
 
 int main() {
     node *root;
-    root = new node("ParserRoot", false);
+    root = new node("parserRoot",false);
     /* read the first word to check the type of statement */
     char *stmtBuf;
     stmtBuf = (char *)malloc(10*sizeof(char));
@@ -20,9 +20,8 @@ int main() {
   //  cout << stmtBuf;
     if (strcmp(stmtBuf, "SELECT") == 0) {
        selectStmt(root);
-       printTree(root, 0);
 
-  //  cout << "print select: " << root->subTree[0]->termString <<endl;
+//    cout << "print select: " << root->subTree[0]->termString <<endl;
       // cout << "print DISTINCT: " << root->subTree[1]->termString <<endl;
   //     cout << "print star" << root->subTree[1]->subTree[0]->termString <<endl;
   //   cout << "select col print: " << root->subTree[1]->subTree[0]->subTree[0]->subTree[0]->termString << endl;
@@ -34,12 +33,17 @@ int main() {
 
     }
     else if (strcmp(stmtBuf, "INSERT") == 0){
-      char* c= (char *)malloc(10*sizeof(char));
-      read(c, false);
-      if(strcmp(c, "INTO") ==0){
-        node *intoNode = new node("INTO", false);
-      insertStmt(root);
-      printTree(root,0);
+        read(stmtBuf, false);
+        if (strcmp(stmtBuf, "INTO") == 0) {
+            insertStmt(root);
+        }
     }
+    else if (strcmp(stmtBuf, "CREATE") == 0){
+        read(stmtBuf, false);
+        if (strcmp(stmtBuf, "TABLE") == 0){
+          //  createTable(root);
+        }
     }
+    cout << endl << endl << "printing tree" << endl;
+    printTree(root, 0);
 }

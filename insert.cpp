@@ -1,6 +1,7 @@
 #include <iostream>
 using namespace std;
 #include <cstdlib>
+#include <cstring>
 #include "io.h"
 #include "parseTree.h"
 #include "select.h"
@@ -124,7 +125,6 @@ void insertStmt(node *parent) {
     parent -> subTree.push_back(insertNode);
     insertTable(parent);
     insertTuples(parent);
-
 
     return;
 }
