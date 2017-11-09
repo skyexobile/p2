@@ -3,7 +3,7 @@ using namespace std;
 #include <cstdlib>
 #include <cstring>
 #include "io.h"
-//#include "common.h"
+#include "common.h"
 #include "insert.h"
 #include "select.h"
 #include "parseTree.h"
@@ -20,6 +20,7 @@ int main() {
   //  cout << stmtBuf;
     if (strcmp(stmtBuf, "SELECT") == 0) {
        selectStmt(root);
+       printTree(root, 0);
 
   //  cout << "print select: " << root->subTree[0]->termString <<endl;
       // cout << "print DISTINCT: " << root->subTree[1]->termString <<endl;
@@ -33,6 +34,12 @@ int main() {
 
     }
     else if (strcmp(stmtBuf, "INSERT") == 0){
+      char* c= (char *)malloc(10*sizeof(char));
+      read(c, false);
+      if(strcmp(c, "INTO") ==0){
+        node *intoNode = new node("INTO", false);
       insertStmt(root);
+      printTree(root,0);
+    }
     }
 }

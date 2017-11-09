@@ -28,38 +28,6 @@ void tablelist(node *parent){
 
 }
 
-void columnName(node *parent){
-    node *colNameNode, *commaNode;
-    bool flgComma = false;
-    colNameNode = new node("colName", false);
-    parent->subTree.push_back(colNameNode);
-    char *temp, *attrName;
-    attrName = (char *)malloc(40*sizeof(char));
-    temp = (char *)malloc(3*sizeof(char));
-    read(temp, false);
-    strcpy(attrName, temp);
-    read(temp, true);
-    if(temp != nullptr){
-      //we have read either a . or ,
-      if(strcmp(temp, "." ) == 0){
-        strcat(attrName, temp);
-        read(temp, false);
-        strcat(attrName, temp);
-      }
-      else if(strcmp(temp, ",") ==0){
-        flgComma = true;
-      }
-    }
-
-    node *atrNameNode;
-    atrNameNode = new node(attrName, true);
-    colNameNode -> subTree.push_back(atrNameNode);
-    if(flgComma){
-        putChar(',');
-    }
-
-    return;
-}
 
 void selSublist(node *parent) {
   cout << "selSublist" << endl;
@@ -76,17 +44,7 @@ void selSublist(node *parent) {
       selSublistNode->subTree.push_back(commaNode);
       selSublist(selSublistNode);
     }
-  /*  else{
-      read(temp, false);
-      if(strcmp(temp,"FROM") == 0){
 
-            putChar(' ');
-        for(int i =(strlen(temp)-1); i>=0; i--){
-          putChar(temp[i]);
-        }
-          return;
-      }
-    }*/
     return;
 }
 
@@ -119,8 +77,9 @@ void selectStmt(node *parent) {
     char* c= (char *)malloc(10*sizeof(char));
     read(c, true);
     if(strcmp(c,"*")==0){
+      putChar('*');
+
         selList(parent);
-        putChar('*');
     }
     else{
         read(c, false);

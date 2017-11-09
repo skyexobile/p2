@@ -8,6 +8,49 @@ using namespace std;
 #include "io.h"
 const int WIDTH = 15;
 
+void columnName(node *parent){
+    node *colNameNode, *commaNode;
+    bool flgComma = false;
+    colNameNode = new node("colName", false);
+    parent->subTree.push_back(colNameNode);
+    char *temp, *attrName;
+    attrName = (char *)malloc(40*sizeof(char));
+    temp = (char *)malloc(3*sizeof(char));
+    read(temp, false);
+    strcpy(attrName, temp);
+    read(temp, true);
+    if(temp != nullptr){
+      //we have read either a . or ,
+      if(strcmp(temp, "." ) == 0){
+        strcat(attrName, temp);
+        read(temp, false);
+        strcat(attrName, temp);
+      }
+      else if(strcmp(temp, ",") ==0){
+        flgComma = true;
+      }
+    }
+    node *atrNameNode;
+    atrNameNode = new node(attrName, true);
+    colNameNode -> subTree.push_back(atrNameNode);
+    if(flgComma){
+        putChar(',');
+    }
+
+    return;
+}
+void attrName(node *parent){
+    node *attrNameNode, *atrName;
+    attrNameNode = new node("attributeName", false);
+    parent->subTree.push_back(attrNameNode);
+    cout << "ADDED  attribute name node" << endl;
+    char *temp;
+    temp = (char *)malloc(20*sizeof(char));
+    read(temp, false);
+    atrName = new node(temp, true);
+    attrNameNode -> subTree.push_back(atrName);
+    return;
+}
 
 void tableName(node *parent){
   node *tableNameNode, *tblNode;
@@ -38,9 +81,25 @@ void printTree(node* curr, int indent) {
         return;
     }
 void term(node* parent){
-  node* termNode;
+  node* termNode, *term, *other;
   termNode = new node("term", false);
-  //check if it is a column-name, literal, or integer
+  char *temp = (char*)malloc(40*sizeof(char));
+  read(temp, true);
+  if(strcmp(temp, "\"")==0){
+    read(temp, false);
+    term = new node(temp, true);
+    termNode->subTree.push_back(term);
+    read(temp, true);
+    return;
+  }
+  read(temp,false);
+  if(isdigit(temp[0])){
+    term = new node(temp, true);
+    termNode->subTree.push_back(term);
+    return;
+  }
+  //this is a columname
+  columnName(termNode);
   return;
 }
 void expression(node* parent){
