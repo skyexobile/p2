@@ -1,6 +1,7 @@
 #include <iostream>
 using namespace std;
 #include <cstdlib>
+#include <cstring>
 #include "io.h"
 #include "parseTree.h"
 #include "select.h"
@@ -137,22 +138,10 @@ void insertTable(node *parent) {
 void insertStmt(node *parent) {
     cout << "in insert Stmt" << endl;
     node *insertNode, *intoNode;
-    insertNode = new node("INSERT", true);
+    insertNode = new node("INSERT INTO", true);
     parent -> subTree.push_back(insertNode);
-    //check if next word is "INTO"
-    char* c= (char *)malloc(10*sizeof(char));
-    read(c, true);
-    if(strcmp(c, "INTO") ==0){
-      intoNode = new node("INTO", true);
-      parent->subTree.push_back(intoNode);
-    }
-    else{
-      //something is wrong
-    return;
-    }
     insertTable(parent);
     insertTuples(parent);
-
 
     return;
 }
