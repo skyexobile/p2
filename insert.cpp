@@ -39,29 +39,33 @@ void valueList(node* parent){
 }
 
 void insertTuples(node* parent){
-  node *insertTuplesNode, *LPNode, *RPNode;
+  node *insertTuplesNode, *LPNode, *RPNode, *selectStmtNode, *values;
   insertTuplesNode = new node("insertTuples", false);
   parent->subTree.push_back(insertTuplesNode);
   char *temp;
   temp = (char *)malloc(20*sizeof(char));
   read(temp, false);
   if(strcmp(temp, "SELECT") == 0){
-    selectStmt(insertTuplesNode);
+    selectStmtNode = new node("selectStmt", false);
+    insertTuplesNode->subTree.push_back(selectStmtNode);
+    selectStmt(selectStmtNode);
     return;
   }
   else if(strcmp(temp, "VALUES") == 0){
     //insert value list or select statement
+    values = new node(temp, false);
+    insertTuplesNode->subTree.push_back(values);
     read(temp, true);
 
     if(strcmp(temp, "(") == 0){
       LPNode = new node("(", true);
-      parent->subTree.push_back(LPNode);
+      insertTuplesNode->subTree.push_back(LPNode);
       valueList(insertTuplesNode);
       read(temp, true);
     }
     if(strcmp(temp, ")" )== 0){
       RPNode = new node(")", true);
-      parent->subTree.push_back(RPNode);
+      insertTuplesNode->subTree.push_back(RPNode);
     }
   }
     return;
@@ -80,7 +84,7 @@ void attrList(node *parent) {
     read(temp, true);
     if(strcmp(temp, ",") == 0){
       commaNode = new node(",", true);
-      parent->subTree.push_back(attrListNode);
+      attrListNode->subTree.push_back(commaNode);
       attrList(attrListNode);
     }
     if(strcmp(temp, ")") ==0){

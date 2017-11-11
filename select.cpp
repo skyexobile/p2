@@ -57,7 +57,7 @@ void selList(node *parent) {
     read(c, true);
     if(strcmp(c, "*") == 0){
       starNode = new node("*", true);
-      parent->subTree.push_back(starNode);
+      selListNode->subTree.push_back(starNode);
     }
     else{
 
