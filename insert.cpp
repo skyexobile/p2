@@ -90,9 +90,12 @@ void attrList(node *parent) {
 }
 
 //use tablename function
-void insertTable(node *parent) {
-    node *tblNameNode, *tblName, *LPNode, *RPNode;
 
+
+void insertStmt(node *parent) {
+    node *insertNode, *intoNode, *LPNode, *RPNode;
+    insertNode = new node("INSERT INTO", true);
+    parent -> subTree.push_back(insertNode);
     tableName(parent);
     char *c;
     c = (char *)malloc(20*sizeof(char));
@@ -109,22 +112,11 @@ void insertTable(node *parent) {
       if(strcmp(c, ")") == 0){
         RPNode = new node(")", true);
         parent->subTree.push_back(RPNode);
-        return;
+        insertTuples(parent);
+
       }
 
     }
-
-
-    return;
-
-}
-
-void insertStmt(node *parent) {
-    node *insertNode, *intoNode;
-    insertNode = new node("INSERT INTO", true);
-    parent -> subTree.push_back(insertNode);
-    insertTable(parent);
-    insertTuples(parent);
 
     return;
 }

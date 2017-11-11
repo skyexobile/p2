@@ -9,7 +9,6 @@ void valueList(node*);
 void insertTuples(node*);
 void attrName(node*);
 void attrList(node*);
-void insertTable(node*);
 void insertStmt(node*);
 
 #endif
