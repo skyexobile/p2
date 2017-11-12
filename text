@@ -1,3 +1,1 @@
-INSERT INTO hawaii(president) VALUES(Obama)
-
-
+CREATE TABLE table(col1 STR20,col2 INT)

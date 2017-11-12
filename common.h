@@ -1,10 +1,11 @@
 #ifndef COMMON_H_INCLUDED
 #define COMMON_H_INCLUDED
 
+#include "stmtDataStructs.h"
 #include "parseTree.h"
 
-void tableName(node* parent);
-void attrName(node *parent);
+void tableName(createTableData *createTableObj);
+void attrName(createTableData *createTableObj);
 void columnName(node *parent);
 void printTree(node *curr, int indent);
 
