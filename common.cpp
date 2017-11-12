@@ -7,7 +7,8 @@ using namespace std;
 #include<vector>
 #include "parseTree.h"
 #include "io.h"
-const int WIDTH = 15;
+#include "stmtDataStructs.h"
+#define WIDTH 15
 
 void columnName(node *parent){
     node *colNameNode, *commaNode;
@@ -40,29 +41,21 @@ void columnName(node *parent){
 
     return;
 }
-void attrName(node *parent){
-    node *attrNameNode, *atrName;
-    attrNameNode = new node("attributeName", false);
-    parent->subTree.push_back(attrNameNode);
-    cout << "ADDED  attribute name node" << endl;
+void attrName(createTableData *crTableObj){
     char *temp;
     temp = (char *)malloc(20*sizeof(char));
     read(temp, false);
-    atrName = new node(temp, true);
-    attrNameNode -> subTree.push_back(atrName);
+    crTableObj->field_names.push_back(string(temp));
     return;
 }
 
-void tableName(node *parent){
-  node *tableNameNode, *tblNode;
-  tableNameNode = new node("tableName", false);
-  parent->subTree.push_back(tableNameNode);
+void tableName(createTableData *crTableObj) {
   char *word = (char*)malloc(10*sizeof(char));
   read(word, false);
-  tblNode = new node(word, true);
-  tableNameNode->subTree.push_back(tblNode);
+  crTableObj->relationName = word;
   return;
 }
+
 void printTree(node* curr, int indent) {
     bool isTermNode;
     isTermNode = curr->isTermNode;
