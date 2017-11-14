@@ -6,7 +6,7 @@ using namespace std;
 #include "parseTree.h"
 #include "select.h"
 #include "common.h"
-
+#include "stmtDataStructs.h"
 void value(insertData *inDataObj){
   char *temp;
   temp = (char *)malloc(20*sizeof(char));

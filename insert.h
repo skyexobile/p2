@@ -2,13 +2,12 @@
 #ifndef INSERT_H
 #define INSERT_H
 
-#include "parseTree.h"
+#include "stmtDataStructs.h"
 
-void value(node*);
-void valueList(node*);
-void insertTuples(node*);
-void attrName(node*);
-void attrList(node*);
-void insertStmt(node*);
+void value(insertData *inDataObj);
+void valueList(insertData *inDataObj);
+void insertTuples(insertData *inDataObj);
+void attrList(insertData *inDataObj);
+void insertStmt(insertData *inDataObj);
 
 #endif
