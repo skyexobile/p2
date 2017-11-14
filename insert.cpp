@@ -7,30 +7,22 @@ using namespace std;
 #include "select.h"
 #include "common.h"
 
-void value(node* parent){
-  node* valueNode, *value;
-  valueNode = new node("value", false);
-  parent->subTree.push_back(valueNode);
+void value(insertData *inDataObj){
   char *temp;
   temp = (char *)malloc(20*sizeof(char));
   read(temp, false);
-  value = new node(temp, true);
-  valueNode->subTree.push_back(value);
+  inDataObj->field_values.push_back(string(temp))
   return;
 
 }
-void valueList(node* parent){
-  node* valuelistNode, *commaNode;
-  valuelistNode = new node("valuelist", false);
-  parent->subTree.push_back(valuelistNode);
-  value(valuelistNode);
+void valueList(insertData *inDataObj){
+
+  value(inDataObj);
   char *temp;
   temp = (char *)malloc(20*sizeof(char));
   read(temp, true);
   if(strcmp(temp, ",") ==0){
-    commaNode = new node(",", true);
-    valuelistNode -> subTree.push_back(commaNode);
-    valueList(valuelistNode);
+    valueList(inDataObj);
   }
   else if(strcmp(temp,")") == 0){
     putChar(')');
@@ -38,34 +30,25 @@ void valueList(node* parent){
   return;
 }
 
-void insertTuples(node* parent){
-  node *insertTuplesNode, *LPNode, *RPNode, *selectStmtNode, *values;
-  insertTuplesNode = new node("insertTuples", false);
-  parent->subTree.push_back(insertTuplesNode);
+void insertTuples(insertData *inDataObj){
+
   char *temp;
   temp = (char *)malloc(20*sizeof(char));
   read(temp, false);
   if(strcmp(temp, "SELECT") == 0){
-    selectStmtNode = new node("selectStmt", false);
-    insertTuplesNode->subTree.push_back(selectStmtNode);
-    selectStmt(selectStmtNode);
+    selectStmt(inDataObj);
     return;
   }
   else if(strcmp(temp, "VALUES") == 0){
-    //insert value list or select statement
-    values = new node(temp, false);
-    insertTuplesNode->subTree.push_back(values);
+
     read(temp, true);
 
     if(strcmp(temp, "(") == 0){
-      LPNode = new node("(", true);
-      insertTuplesNode->subTree.push_back(LPNode);
-      valueList(insertTuplesNode);
+            valueList(inDataObj);
       read(temp, true);
     }
     if(strcmp(temp, ")" )== 0){
-      RPNode = new node(")", true);
-      insertTuplesNode->subTree.push_back(RPNode);
+
     }
   }
     return;
@@ -73,19 +56,16 @@ void insertTuples(node* parent){
 
 }
 
-void attrList(node *parent) {
+void attrList(insertData *inDataObj) {
     node *attrListNode, *commaNode;
     char *temp;
     temp = (char *)malloc(3*sizeof(char));
-    attrListNode = new node("attrList", false);
-    parent -> subTree.push_back(attrListNode);
-    cout << "added attribute list node" << endl;
-    attrName(attrListNode);
+  ;
+    attrName(inDataObj);
     read(temp, true);
     if(strcmp(temp, ",") == 0){
-      commaNode = new node(",", true);
-      attrListNode->subTree.push_back(commaNode);
-      attrList(attrListNode);
+
+      attrList(inDataObj);
     }
     if(strcmp(temp, ")") ==0){
       putChar(')');
@@ -96,11 +76,8 @@ void attrList(node *parent) {
 //use tablename function
 
 
-void insertStmt(node *parent) {
-    node *insertNode, *intoNode, *LPNode, *RPNode;
-    insertNode = new node("INSERT INTO", true);
-    parent -> subTree.push_back(insertNode);
-    tableName(parent);
+void insertStmt(insertData *inDataObj) {
+    tableName(inDataObj);
     char *c;
     c = (char *)malloc(20*sizeof(char));
     read(c, true);
@@ -108,15 +85,11 @@ void insertStmt(node *parent) {
       read(c,true);
     }
     if(strcmp(c, "(") == 0){
-      //append and call attribute list
-      LPNode = new node("(", true);
-      parent->subTree.push_back(LPNode);
-      attrList(parent);
+      //append and call attribute listf
+      attrList(inDataObj);
       read(c, true);
       if(strcmp(c, ")") == 0){
-        RPNode = new node(")", true);
-        parent->subTree.push_back(RPNode);
-        insertTuples(parent);
+        insertTuples(inDataObj);
 
       }
 
