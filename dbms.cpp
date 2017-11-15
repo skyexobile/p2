@@ -9,11 +9,15 @@ using namespace std;
 #include "createTable.h"
 #include "parseTree.h"
 #include "stmtDataStructs.h"
+#include "Block.h"
+#include "Config.h"
+#include "Disk.h"
+#include "Field.h"
+#include "MainMemory.h"
 #include "Relation.h"
 #include "Schema.h"
 #include "SchemaManager.h"
-#include "Disk.h"
-#include "MainMemory.h"
+#include "Tuple.h"
 #include <unordered_map>
 
 int main() {
@@ -52,9 +56,9 @@ int main() {
             createTable(&crTableObj);
             cout << crTableObj << endl;
 
-            Schema schema(crTableObj->field_names,crTableObj->field_types);
-            Relation* relation_ptr=schema_manager.createRelation(crTableObj->relation_name,schema);
-            tablePtrs[crTableObj->relation_name] = relation_ptr;
+            Schema schema(crTableObj.field_names,crTableObj.field_types);
+            Relation* relation_ptr=schema_manager.createRelation(crTableObj.relationName,schema);
+            tablePtrs[crTableObj.relationName] = relation_ptr;
         }
     }
 }
