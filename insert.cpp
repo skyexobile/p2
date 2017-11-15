@@ -83,6 +83,7 @@ void insertStmt(insertData *inDataObj) {
     c = (char *)malloc(20*sizeof(char));
     char *tableNameBuf = (char*)malloc(10*sizeof(char));
     tableName(tableNameBuf);
+    inDataObj->relationName = tableNameBuf;
     //inDataObj->field_names.push_back(string(tableNameBuf));
     read(c, true);
     if(c[0] == '\0'){

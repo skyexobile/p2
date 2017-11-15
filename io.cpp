@@ -9,18 +9,17 @@ static int flag;
 char getChar() {
     char c;
     char p = cin.peek();
-  if(flag ==1 && p == '\n'){
-      flag = 2;
+
+  if(flag== 1 && p == '\n'){
+    flag = 0;
       return '\0';
     }
-
     if (!buffer.empty()) {
         c = buffer.top();
         buffer.pop();
     } else {
         cin.get(c);
         flag = 1;
-
     }
     return c;
 }
@@ -31,15 +30,13 @@ void putChar(char c) {
 }
 
 void read(char *sbuf, bool oneChar) {
-  if(flag == 2){
-    if(buffer.empty()){
+    char c = (getChar());
+    if(c=='\0')
+    {
+      cout << "NOTHING" << endl;
       sbuf[0] = '\0';
       return;
     }
-
-  }
-    char c = (getChar());
-
     switch(c) {
         case '*':
         case ',':
