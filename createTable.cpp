@@ -19,7 +19,10 @@ void dataType(createTableData *crTableObj) {
 }
 
 void attributeTypeList(createTableData *crTableObj) {
-    attrName(crTableObj);
+    char *attrNameBuf;
+    attrNameBuf = (char *)malloc(20*sizeof(char));
+    attrName(attrNameBuf);
+    crTableObj->field_names.push_back(string(attrNameBuf));
     dataType(crTableObj);
     char *comBuf = (char *)malloc(2*sizeof(char));
     read(comBuf, true);
@@ -30,7 +33,9 @@ void attributeTypeList(createTableData *crTableObj) {
 }
     
 void createTable(createTableData *crTableObj) {
-    tableName(crTableObj);
+    char *tableNameBuf = (char*)malloc(10*sizeof(char));
+    tableName(tableNameBuf);
+    crTableObj->relationName = tableNameBuf;
     char *parenBuf;
     parenBuf = (char *)malloc(2*sizeof(char));
     read(parenBuf, true);

@@ -4,8 +4,8 @@
 #include "stmtDataStructs.h"
 #include "parseTree.h"
 
-void tableName(createTableData *createTableObj);
-void attrName(createTableData *createTableObj);
+void tableName(char *tableNameBuf);
+void attrName(char *attrNameBuf);
 void columnName(node *parent);
 void printTree(node *curr, int indent);
 

@@ -41,18 +41,13 @@ void columnName(node *parent){
 
     return;
 }
-void attrName(createTableData *crTableObj){
-    char *temp;
-    temp = (char *)malloc(20*sizeof(char));
-    read(temp, false);
-    crTableObj->field_names.push_back(string(temp));
+void attrName(char *attrNameBuf){
+    read(attrNameBuf, false);
     return;
 }
 
-void tableName(createTableData *crTableObj) {
-  char *word = (char*)malloc(10*sizeof(char));
-  read(word, false);
-  crTableObj->relationName = word;
+void tableName(char *tableNameBuf) {
+  read(tableNameBuf, false);
   return;
 }
 
