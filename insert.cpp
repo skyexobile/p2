@@ -11,7 +11,7 @@ void value(insertData *inDataObj){
   char *temp;
   temp = (char *)malloc(20*sizeof(char));
   read(temp, false);
-  inDataObj->field_values.push_back(string(temp))
+  inDataObj->field_values.push_back(string(temp));
   return;
 
 }
@@ -36,7 +36,7 @@ void insertTuples(insertData *inDataObj){
   temp = (char *)malloc(20*sizeof(char));
   read(temp, false);
   if(strcmp(temp, "SELECT") == 0){
-    selectStmt(inDataObj);
+    //selectStmt(inDataObj);
     return;
   }
   else if(strcmp(temp, "VALUES") == 0){
@@ -60,8 +60,10 @@ void attrList(insertData *inDataObj) {
     node *attrListNode, *commaNode;
     char *temp;
     temp = (char *)malloc(3*sizeof(char));
-  ;
-    attrName(inDataObj);
+    char *attrNameBuf;
+    attrNameBuf = (char *)malloc(20*sizeof(char));
+    attrName(attrNameBuf);
+    inDataObj->field_names.push_back(string(attrNameBuf));
     read(temp, true);
     if(strcmp(temp, ",") == 0){
 
@@ -77,9 +79,11 @@ void attrList(insertData *inDataObj) {
 
 
 void insertStmt(insertData *inDataObj) {
-    tableName(inDataObj);
     char *c;
     c = (char *)malloc(20*sizeof(char));
+    char *tableNameBuf = (char*)malloc(10*sizeof(char));
+    tableName(tableNameBuf);
+    inDataObj->field_names.push_back(string(tableNameBuf));
     read(c, true);
     if(c[0] == '\0'){
       read(c,true);
