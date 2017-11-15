@@ -91,7 +91,7 @@ int main() {
             }
         }
     }
-    cout << endl << "Enter INSERT STATEMENT: " <<endl
+    cout << endl << "Enter INSERT STATEMENT: " <<endl;
     read(stmtBuf2, false);
     if (strcmp(stmtBuf2, "INSERT") == 0){
         read(stmtBuf2, false);
