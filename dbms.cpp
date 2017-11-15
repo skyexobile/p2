@@ -9,10 +9,26 @@ using namespace std;
 #include "createTable.h"
 #include "parseTree.h"
 #include "stmtDataStructs.h"
+#include "Relation.h"
+#include "Schema.h"
+#include "SchemaManager.h"
+#include "Disk.h"
+#include "MainMemory.h"
+#include <unordered_map>
 
 int main() {
-    node *root;
-    root = new node("parserRoot",false);
+
+    /* Initialize the main memory and disk */
+    MainMemory mem;
+    Disk disk;
+    cout << "The memory contains " << mem.getMemorySize() << " blocks" << endl;
+    cout << mem << endl << endl;
+    SchemaManager schema_manager(&mem,&disk);
+
+    disk.resetDiskIOs();
+    disk.resetDiskTimer();
+    unordered_map<string, Relation *> tablePtrs;
+
     /* read the first word to check the type of statement */
     char *stmtBuf;
     stmtBuf = (char *)malloc(10*sizeof(char));
@@ -34,8 +50,10 @@ int main() {
             createTableData crTableObj;
             createTable(&crTableObj);
             cout << crTableObj << endl;
+
+            Schema schema(crTableObj->field_names,crTableObj->field_types);
+            Relation* relation_ptr=schema_manager.createRelation(crTableObj->relation_name,schema);
+            tablePtrs[crTableObj->relation_name] = relation_ptr;
         }
     }
-    // cout << endl << endl << "printing tree" << endl;
-    // printTree(root, 0);
 }
