@@ -36,6 +36,8 @@ class insertData {
     public:
         vector<string> field_names;
         vector<string> field_values;
+        string relationName;
+
         friend ostream& operator<< (ostream& out, const insertData& inDataObj) {
             out << "field name: " << '\n';
             for (const auto& i:inDataObj.field_names) {
