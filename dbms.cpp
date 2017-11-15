@@ -25,8 +25,9 @@ int main() {
     else if (strcmp(stmtBuf, "INSERT") == 0){
         read(stmtBuf, false);
         if (strcmp(stmtBuf, "INTO") == 0) {
-           // insertStmt(root);
-        }
+          insertData inDataObj;
+          insertStmt(&inDataObj);
+          cout << inDataObj << endl;        }
     }
     else if (strcmp(stmtBuf, "CREATE") == 0){
         read(stmtBuf, false);
