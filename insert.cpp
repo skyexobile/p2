@@ -7,10 +7,14 @@ using namespace std;
 #include "select.h"
 #include "common.h"
 #include "stmtDataStructs.h"
+
 void value(insertData *inDataObj){
-  char *temp;
+  char *temp, *quoteBuf;
   temp = (char *)malloc(20*sizeof(char));
+  quoteBuf = (char *)malloc(2*sizeof(char));
+  read(quoteBuf,true);
   read(temp, false);
+  read(quoteBuf, true);
   inDataObj->field_values.push_back(string(temp));
   return;
 
