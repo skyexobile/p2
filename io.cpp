@@ -12,7 +12,7 @@ char getChar() {
 
   if(flag== 1 && p == '\n'){
     flag = 0;
-      return '\0';
+      return '\n';
     }
     if (!buffer.empty()) {
         c = buffer.top();
@@ -31,12 +31,6 @@ void putChar(char c) {
 
 void read(char *sbuf, bool oneChar) {
     char c = (getChar());
-    if(c=='\0')
-    {
-      cout << "NOTHING" << endl;
-      sbuf[0] = '\0';
-      return;
-    }
     switch(c) {
         case '*':
         case ',':
@@ -48,17 +42,17 @@ void read(char *sbuf, bool oneChar) {
         case '<':
         case '>':
         case '=':
+        case '\"':
             sbuf[0] = c;
             sbuf[1] = '\0';
             break;
         case ' ':
-        case '\0':
-        sbuf[0] = '\0';
-
-           break;
+            sbuf[0] = '\0';
+            break;
         default:
-            // we read in a letter or a digit
+            // we read in a letter or a digit, if we were expecting a parentheses or something, then we would have to return null
             putChar(c);
+            sbuf[0] = '\0';
             break;
     }
 
@@ -71,20 +65,10 @@ void read(char *sbuf, bool oneChar) {
         if (isalpha(c) || isdigit(c)) {
             sbuf[i] = c;
         } else {
-          //at this point, we're going to find character at end of word, like a comma..so we want to push it back into buffer
-          switch(c) {
-              case '*':
-              case ',':
-              case '.':
-              case '\"':
-              case '(':
-              case ')':
-                  buffer.push(c);
-                  return;
-              case ' ':
-              sbuf[i] = '\0';
+            //at this point, we're going to find character at end of word, like a comma..so we want to push it back into buffer
+            buffer.push(c);
+            sbuf[i] = '\0';
             return;
-          }
         }
     }
 }

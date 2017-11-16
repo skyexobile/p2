@@ -32,6 +32,7 @@ void appendTupleToRelation(Relation* relation_ptr, MainMemory& mem, int memory_b
             cout << "The block is not full" << endl;
             block_ptr->appendTuple(tuple); // append the tuple
             relation_ptr->setBlock(relation_ptr->getNumOfBlocks()-1,memory_block_index); //write back to the relation
+            return;
         }
     }
 
@@ -46,7 +47,6 @@ int main() {
     /* Initialize the main memory and disk */
     MainMemory mem;
     Disk disk;
-    cout << "The memory contains " << mem.getMemorySize() << " blocks" << endl;
     SchemaManager schema_manager(&mem,&disk);
 
     disk.resetDiskIOs();
@@ -57,9 +57,7 @@ int main() {
     char *stmtBuf, *stmtBuf2;
     stmtBuf= (char *)malloc(10*sizeof(char));
     read(stmtBuf, false);
-    cout << stmtBuf << endl;
-    while(*stmtBuf != EOF) {
-        cout << stmtBuf << endl;
+    while(1) {
         /* call the corresponding subroutine */
         if (strcmp(stmtBuf, "SELECT") == 0) {
             // selectStmt(root);
