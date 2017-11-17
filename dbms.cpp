@@ -56,14 +56,14 @@ int main() {
     /* read the first word to check the type of statement */
     char *stmtBuf, *stmtBuf2;
     stmtBuf= (char *)malloc(10*sizeof(char));
-    read(stmtBuf, false);
+    readWord(stmtBuf);
     while(1) {
         /* call the corresponding subroutine */
         if (strcmp(stmtBuf, "SELECT") == 0) {
             // selectStmt(root);
         }
         else if (strcmp(stmtBuf, "CREATE") == 0){
-            read(stmtBuf, false);
+            readWord(stmtBuf);
             if (strcmp(stmtBuf, "TABLE") == 0){
                 createTableData crTableObj;
                 createTable(&crTableObj);
@@ -73,17 +73,12 @@ int main() {
                 Schema schema(crTableObj.field_names,crTableObj.field_types);
                 Relation* relation_ptr=schema_manager.createRelation(crTableObj.relationName,schema);
                 tablePtrs[crTableObj.relationName] = relation_ptr;
-                cout << "The schema has field types: " << endl;
-                field_types=schema.getFieldTypes();
-                for (int i=0;i<schema.getNumOfFields();i++) {
-                    cout << (field_types[i]==0?"INT":"STR20") << "\t";
-                }
             }
         } else if (strcmp(stmtBuf, "INSERT") == 0){
-            read(stmtBuf, false);
+            readWord(stmtBuf);
             if (strcmp(stmtBuf, "INTO") == 0) {
                 insertData inDataObj;
-                insertStmt(&inDataObj);
+                //insertStmt(&inDataObj);
                 cout << inDataObj << endl;
                 //create tuple
                 Tuple tuple = tablePtrs[inDataObj.relationName]->createTuple();
@@ -109,6 +104,6 @@ int main() {
 
             }
         }
-        read(stmtBuf, false);
+        readWord(stmtBuf);
     }
 }

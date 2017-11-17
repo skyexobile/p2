@@ -1,1 +1,2 @@
-burp
+CREATE TABLE table(col1 INT, col2 STR20)
+INSERT INTO table(col1, col2) VALUES(3, "A)

@@ -11,9 +11,8 @@ using namespace std;
 void value(insertData *inDataObj){
   char *temp, *quoteBuf;
   temp = (char *)malloc(20*sizeof(char));
-  quoteBuf = (char *)malloc(2*sizeof(char));
   readQuote();
-  read(temp, false);
+  readWord(temp);
   readQuote();
   inDataObj->field_values.push_back(string(temp));
   return;

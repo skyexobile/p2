@@ -18,14 +18,14 @@ void columnName(node *parent){
     char *temp, *attrName;
     attrName = (char *)malloc(40*sizeof(char));
     temp = (char *)malloc(3*sizeof(char));
-    read(temp, false);
+    readWord(temp);
     strcpy(attrName, temp);
-    read(temp, true);
+    readPeriod();
     if(temp != nullptr){
       //we have read either a . or ,
       if(strcmp(temp, "." ) == 0){
         strcat(attrName, temp);
-        read(temp, false);
+        readWord(temp);
         strcat(attrName, temp);
       }
       else if(strcmp(temp, ",") ==0){
@@ -42,46 +42,34 @@ void columnName(node *parent){
     return;
 }
 void attrName(char *attrNameBuf){
-    read(attrNameBuf, false);
+    readWord(attrNameBuf);
+    if (!attrNameBuf[0]) {
+        cerr << "attrName: attrName not read";
+    }
     return;
 }
 
 void tableName(char *tableNameBuf) {
-  read(tableNameBuf, false);
+  readWord(tableNameBuf);
+    if (!tableNameBuf[0]) {
+        cerr << "tableName: tableName not read";
+    }
   return;
 }
 
-void printTree(node* curr, int indent) {
-    bool isTermNode;
-    isTermNode = curr->isTermNode;
-    if (isTermNode) {
-        // terminal node
-        cout << setw(WIDTH*indent) << curr->nodeName << endl;
-        return;
-    } else {
-        // non-terminal node
-        cout << setw(WIDTH*indent) << curr->nodeName << endl;
-        vector<node *> vectChildNodes;
-        vectChildNodes = curr -> subTree;
-        for (auto& nodeptr:vectChildNodes) {
-            printTree(nodeptr, indent+1);
-        }
-      }
-        return;
-    }
 void term(node* parent){
   node* termNode, *term, *other;
   termNode = new node("term", false);
   char *temp = (char*)malloc(40*sizeof(char));
-  read(temp, true);
+  readWord(temp);
   if(strcmp(temp, "\"")==0){
-    read(temp, false);
+    readWord(temp);
     term = new node(temp, true);
     termNode->subTree.push_back(term);
-    read(temp, true);
+    readWord(temp);
     return;
   }
-  read(temp,false);
+  readWord(temp);
   if(isdigit(temp[0])){
     term = new node(temp, true);
     termNode->subTree.push_back(term);
@@ -98,7 +86,7 @@ void expression(node* parent){
   parent->subTree.push_back(expressNode);
   //check if there's a (  for +, =, or * after term
   char *temp = (char*)malloc(10*sizeof(char));
-  read(temp, true);
+  readWord(temp);
   if(strcmp(temp, "(" )==0){
     other = new node("(", true);
     expressNode->subTree.push_back(other);
@@ -108,11 +96,11 @@ void expression(node* parent){
   term(expressNode);
   if(flag){
     //next should be +, -, or *
-    read(temp, true);
+    readWord(temp);
     other = new node(temp, true);
     expressNode->subTree.push_back(other);
     term(expressNode);
-    read(temp, true);
+    readWord(temp);
     if(strcmp(temp, ")") ==0){
       other = new node(")", true);
       expressNode->subTree.push_back(other);
@@ -126,7 +114,7 @@ void comp_op(node* parent){
   comp = new node("comp_operation", false);
   parent->subTree.push_back(comp);
   char *temp = (char*)malloc(3*sizeof(char));
-  read(temp, true);
+  readWord(temp);
 
   if(strcmp(temp, "<") == 0){
     comp_operator = new node("<", true);
@@ -161,7 +149,7 @@ void booleanTerm(node* parent){
   booleanFactor(boolTerm);
   //check if there's an AND afterwards
   char *word = (char*)malloc(10*sizeof(char));
-  read(word, false);
+  readWord(word);
   if(strcmp(word, "AND") ==0){
     other = new node("AND", true);
     boolTerm->subTree.push_back(other);
@@ -185,7 +173,7 @@ void searchCondition(node *parent)
   booleanTerm(searchCond);
   //check if there's an OR after it
   char *word = (char*)malloc(10*sizeof(char));
-  read(word, false);
+  readWord(word);
   if(strcmp(word, "OR") ==0){
     other = new node("OR", true);
     searchCond->subTree.push_back(other);

@@ -6,7 +6,7 @@ using namespace std;
 
 static stack<char> buffer;
 static int flag;
-char getChar() {
+char getChar1() {
     char c;
     char p = cin.peek();
 
@@ -18,8 +18,19 @@ char getChar() {
         c = buffer.top();
         buffer.pop();
     } else {
-        cin >> c;
+        c = getChar1();
         flag = 1;
+    }
+    return c;
+}
+
+char getChar() {
+    char c;
+    if (!buffer.empty()) {
+        c = buffer.top();
+        buffer.pop();
+    } else {
+        cin >> c;
     }
     return c;
 }
@@ -37,7 +48,7 @@ void readWord(char *sbuf) {
             sbuf[i] = c;
         } else {
             //at this point, we're going to find character at end of word, like a comma..so we want to push it back into buffer
-            buffer.push(c);
+            cin.unget();
             sbuf[i] = '\0';
             return;
         }
@@ -49,15 +60,18 @@ void readQuote() {
     char c;
     cin >> c;
     if ((c != '\"') || (c != '\'')) {
-        putChar(c);
+        cin.unget();
     }
 }
 
-void readParen() {
+bool readParen() {
     char c;
     cin >> c;
     if ((c != '(') || (c != ')')) {
-        putChar(c);
+        return true;
+    } else {
+        cin.unget();
+        return false;
     }
 }
 
@@ -67,7 +81,7 @@ bool readStar() {
     if (c == '*') {
         return true;
     } else {
-        putChar(c);
+        cin.unget();
         return false;
     }
 }
@@ -78,7 +92,7 @@ bool readComma() {
     if (c == ',') {
         return true;
     } else {
-        putChar(c);
+        cin.unget();
         return false;
     }
 }
@@ -89,7 +103,7 @@ bool readPeriod() {
     if (c == '.') {
         return true;
     } else {
-        putChar(c);
+        cin.unget();
         return false;
     }
 } 
@@ -100,16 +114,24 @@ char readCompOp() {
     if ((c == '<') || (c == '>') ||  (c == '=')){
         return c;
     } else {
-        putChar(c);
+        cin.unget();
         return '\0';
     }
 } 
 
+/*
 int main() {
     char *ptr;
     ptr = (char *)malloc(10*sizeof(char));
-    //bool b =readStar();
-    readWord(ptr);
-    cout << ptr;
+    bool b =readPeriod();
+    // readWord(ptr);
+    if (b == true) {
+        cout << "Preriod read\n";
+    } else {
+        char c;
+        cin >> c;
+        cout << "Read character was " << c;
+    }
     return 0;
 }
+*/

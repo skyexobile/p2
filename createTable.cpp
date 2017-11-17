@@ -9,12 +9,13 @@ using namespace std;
 
 void dataType(createTableData *crTableObj) {
     char *dataTypeBuf = (char *)malloc(10*sizeof(char));
-    read(dataTypeBuf, false);
+    readWord(dataTypeBuf);
     if (strcmp(dataTypeBuf, "INT") == 0) {
         crTableObj->field_types.push_back(INT);
     } else if (strcmp(dataTypeBuf, "STR20") == 0) {
         crTableObj->field_types.push_back(STR20);
     } else {
+        cerr << "dataType: datatype is not STR20 or INT"; 
     }
 }
 
@@ -24,9 +25,7 @@ void attributeTypeList(createTableData *crTableObj) {
     attrName(attrNameBuf);
     crTableObj->field_names.push_back(string(attrNameBuf));
     dataType(crTableObj);
-    char *comBuf = (char *)malloc(2*sizeof(char));
-    read(comBuf, true);
-    if (strcmp(comBuf, ",") == 0) {
+    if (readComma()) {
         attributeTypeList(crTableObj);
     }
     return;
@@ -36,16 +35,13 @@ void createTable(createTableData *crTableObj) {
     char *tableNameBuf = (char*)malloc(10*sizeof(char));
     tableName(tableNameBuf);
     crTableObj->relationName = tableNameBuf;
-    char *parenBuf;
-    parenBuf = (char *)malloc(2*sizeof(char));
-    read(parenBuf, true);
-    if (strcmp(parenBuf, "(") == 0) {
+    if (readParen()) {
         attributeTypeList(crTableObj);
     } else {
-        cout << "Error in CREATE TABLE statement" << endl;
+        cerr << "createTable: missing left parentheses";
     }
-    read(parenBuf, true);
-    if (strcmp(parenBuf, ")") == 0) {
+    if (!readParen()) {
+        cerr << "createTable: missing right parentheses";
     }
 }
 
