@@ -1,7 +1,1 @@
-CREATE TABLE table(col1 STR20,col2 INT)
-INSERT INTO table(col1, col2) VALUES("A", 3)
-INSERT INTO table(col1, col2) VALUES("B", 4)
-INSERT INTO table(col1, col2) VALUES("C", 5)
-INSERT INTO table(col1, col2) VALUES("D", 6)
-INSERT INTO table(col1, col2) VALUES("E", 7)
-
+burp

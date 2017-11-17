@@ -12,9 +12,9 @@ void value(insertData *inDataObj){
   char *temp, *quoteBuf;
   temp = (char *)malloc(20*sizeof(char));
   quoteBuf = (char *)malloc(2*sizeof(char));
-  read(quoteBuf,true);
+  readQuote();
   read(temp, false);
-  read(quoteBuf, true);
+  readQuote();
   inDataObj->field_values.push_back(string(temp));
   return;
 
@@ -29,7 +29,7 @@ void valueList(insertData *inDataObj){
     valueList(inDataObj);
   }
   else if(strcmp(temp,")") == 0){
-    putChar(')');
+      return;
   }
   return;
 }
@@ -48,8 +48,8 @@ void insertTuples(insertData *inDataObj){
     read(temp, true);
 
     if(strcmp(temp, "(") == 0){
-            valueList(inDataObj);
-      read(temp, true);
+        valueList(inDataObj);
+        read(temp, true);
     }
     if(strcmp(temp, ")" )== 0){
 
@@ -70,11 +70,11 @@ void attrList(insertData *inDataObj) {
     inDataObj->field_names.push_back(string(attrNameBuf));
     read(temp, true);
     if(strcmp(temp, ",") == 0){
-
       attrList(inDataObj);
     }
     if(strcmp(temp, ")") ==0){
-      putChar(')');
+        // this is needed since we may remove the ) while checking for the ,
+        putChar(')');
     }
     return;
 }
@@ -101,8 +101,6 @@ void insertStmt(insertData *inDataObj) {
         insertTuples(inDataObj);
 
       }
-
     }
-
     return;
 }

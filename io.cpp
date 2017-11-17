@@ -18,7 +18,7 @@ char getChar() {
         c = buffer.top();
         buffer.pop();
     } else {
-        cin.get(c);
+        cin >> c;
         flag = 1;
     }
     return c;
@@ -26,42 +26,13 @@ char getChar() {
 
 void putChar(char c) {
     buffer.push(c);
-
 }
 
-void read(char *sbuf, bool oneChar) {
-    char c = (getChar());
-    switch(c) {
-        case '*':
-        case ',':
-        case '.':
-        case '\'':
-        case '\n':
-        case '(':
-        case ')':
-        case '<':
-        case '>':
-        case '=':
-        case '\"':
-            sbuf[0] = c;
-            sbuf[1] = '\0';
-            break;
-        case ' ':
-            sbuf[0] = '\0';
-            break;
-        default:
-            // we read in a letter or a digit, if we were expecting a parentheses or something, then we would have to return null
-            putChar(c);
-            sbuf[0] = '\0';
-            break;
-    }
-
-    // we haven't read a * , ' \n or .
-    if (oneChar) {
-        return;
-    }
-
-    for (int i=0; c = getChar(); i++) {
+void readWord(char *sbuf) {
+    char c;
+    cin >> c;
+    
+    for (int i=0;; i++) {
         if (isalpha(c) || isdigit(c)) {
             sbuf[i] = c;
         } else {
@@ -70,16 +41,75 @@ void read(char *sbuf, bool oneChar) {
             sbuf[i] = '\0';
             return;
         }
+        cin.get(c);
     }
 }
-/*
+
+void readQuote() {
+    char c;
+    cin >> c;
+    if ((c != '\"') || (c != '\'')) {
+        putChar(c);
+    }
+}
+
+void readParen() {
+    char c;
+    cin >> c;
+    if ((c != '(') || (c != ')')) {
+        putChar(c);
+    }
+}
+
+bool readStar() {
+    char c;
+    cin >> c;
+    if (c == '*') {
+        return true;
+    } else {
+        putChar(c);
+        return false;
+    }
+}
+
+bool readComma() {
+    char c;
+    cin >> c;
+    if (c == ',') {
+        return true;
+    } else {
+        putChar(c);
+        return false;
+    }
+}
+
+bool readPeriod() {
+    char c;
+    cin >> c;
+    if (c == '.') {
+        return true;
+    } else {
+        putChar(c);
+        return false;
+    }
+} 
+
+char readCompOp() {
+    char c;
+    cin >> c;
+    if ((c == '<') || (c == '>') ||  (c == '=')){
+        return c;
+    } else {
+        putChar(c);
+        return '\0';
+    }
+} 
+
 int main() {
     char *ptr;
     ptr = (char *)malloc(10*sizeof(char));
-    read(ptr, false);
-    cout << ptr;
-    read(ptr, true);
+    //bool b =readStar();
+    readWord(ptr);
     cout << ptr;
     return 0;
-
-}*/
+}
