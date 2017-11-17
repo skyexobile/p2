@@ -78,7 +78,7 @@ int main() {
             readWord(stmtBuf);
             if (strcmp(stmtBuf, "INTO") == 0) {
                 insertData inDataObj;
-                //insertStmt(&inDataObj);
+                insertStmt(&inDataObj);
                 cout << inDataObj << endl;
                 //create tuple
                 Tuple tuple = tablePtrs[inDataObj.relationName]->createTuple();

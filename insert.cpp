@@ -16,18 +16,14 @@ void value(insertData *inDataObj){
   readQuote();
   inDataObj->field_values.push_back(string(temp));
   return;
-
 }
 void valueList(insertData *inDataObj){
 
   value(inDataObj);
-  char *temp;
-  temp = (char *)malloc(20*sizeof(char));
-  read(temp, true);
-  if(strcmp(temp, ",") ==0){
+  if(readComma()){
     valueList(inDataObj);
   }
-  else if(strcmp(temp,")") == 0){
+  else if(readParen()){
       return;
   }
   return;
@@ -37,43 +33,30 @@ void insertTuples(insertData *inDataObj){
 
   char *temp;
   temp = (char *)malloc(20*sizeof(char));
-  read(temp, false);
+  readWord(temp);
   if(strcmp(temp, "SELECT") == 0){
     //selectStmt(inDataObj);
-    return;
+    //return;
   }
-  else if(strcmp(temp, "VALUES") == 0){
-
-    read(temp, true);
-
-    if(strcmp(temp, "(") == 0){
+  if(strcmp(temp, "VALUES") == 0){
+    if(readParen()){
         valueList(inDataObj);
-        read(temp, true);
     }
-    if(strcmp(temp, ")" )== 0){
-
+    if(readParen()){
     }
   }
     return;
-
-
 }
 
 void attrList(insertData *inDataObj) {
-    node *attrListNode, *commaNode;
-    char *temp;
-    temp = (char *)malloc(3*sizeof(char));
     char *attrNameBuf;
     attrNameBuf = (char *)malloc(20*sizeof(char));
     attrName(attrNameBuf);
     inDataObj->field_names.push_back(string(attrNameBuf));
-    read(temp, true);
-    if(strcmp(temp, ",") == 0){
+    if(readComma()){
       attrList(inDataObj);
     }
-    if(strcmp(temp, ")") ==0){
-        // this is needed since we may remove the ) while checking for the ,
-        putChar(')');
+    if(readParen()){
     }
     return;
 }
@@ -82,23 +65,14 @@ void attrList(insertData *inDataObj) {
 
 
 void insertStmt(insertData *inDataObj) {
-    char *c;
-    c = (char *)malloc(20*sizeof(char));
     char *tableNameBuf = (char*)malloc(10*sizeof(char));
     tableName(tableNameBuf);
     inDataObj->relationName = tableNameBuf;
-    //inDataObj->field_names.push_back(string(tableNameBuf));
-    read(c, true);
-    if(c[0] == '\0'){
-      read(c,true);
-    }
-    if(strcmp(c, "(") == 0){
+    if(readParen()){
       //append and call attribute listf
       attrList(inDataObj);
-      read(c, true);
-      if(strcmp(c, ")") == 0){
+      if(readParen()){
         insertTuples(inDataObj);
-
       }
     }
     return;
