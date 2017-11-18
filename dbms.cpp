@@ -85,11 +85,10 @@ int main() {
                 //check to see how many fields to add
                 int size = inDataObj.field_names.size();
                 for(int i = 0; i <size ; i++){
-                    string fv= inDataObj.field_values[i];
-                    if(isdigit(fv[0])){
-                        int fvInteger = stoi(fv);
+                    string fieldValue = inDataObj.field_values[i];
+                    if(isdigit(fieldValue[0])){
+                        int fvInteger = stoi(fieldValue);
                         tuple.setField(inDataObj.field_names[i],fvInteger);
-
                     }
                     else{
                         tuple.setField(inDataObj.field_names[i],inDataObj.field_values[i]);

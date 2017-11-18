@@ -393,12 +393,15 @@ bool Tuple::setField(string field_name,string s){
     return false;
   }
   int offset=schema.getFieldOffset(field_name);
+  /*
   if (schema.getFieldType(offset)!=STR20) {
-    cerr<<"setField ERROR: field type not STR20!"<<endl;
-    return false;
+     cerr<<"setField ERROR: field type not STR20!"<<endl;
+     return false;
   } else {
     fields[offset].str=new string(s);
   }
+  */
+    fields[offset].str=new string(s);
   return true;
 }
 

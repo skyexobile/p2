@@ -9,43 +9,46 @@ using namespace std;
 #include "stmtDataStructs.h"
 
 void value(insertData *inDataObj){
-  char *temp, *quoteBuf;
+  char *temp;
   temp = (char *)malloc(20*sizeof(char));
   readQuote();
   readWord(temp);
+  if(!temp[0]) {
+      cerr << "value: value not read";
+  }
   readQuote();
   inDataObj->field_values.push_back(string(temp));
   return;
 }
-void valueList(insertData *inDataObj){
 
+void valueList(insertData *inDataObj){
   value(inDataObj);
   if(readComma()){
     valueList(inDataObj);
-  }
-  else if(readParen()){
-      return;
   }
   return;
 }
 
 void insertTuples(insertData *inDataObj){
+    char *temp;
+    temp = (char *)malloc(20*sizeof(char));
+    readWord(temp);
+    if(!temp[0]) {
+        cerr << "insertTuples: nothing read";
+    }
 
-  char *temp;
-  temp = (char *)malloc(20*sizeof(char));
-  readWord(temp);
-  if(strcmp(temp, "SELECT") == 0){
-    //selectStmt(inDataObj);
-    //return;
-  }
-  if(strcmp(temp, "VALUES") == 0){
-    if(readParen()){
-        valueList(inDataObj);
+    if(strcmp(temp, "SELECT") == 0){
+        //selectStmt(inDataObj);
+        //return;
+    } else if(strcmp(temp, "VALUES") == 0){
+        if(readParen()){
+            valueList(inDataObj);
+        }
+        if(readParen()){
+            return;
+        }
     }
-    if(readParen()){
-    }
-  }
-    return;
+    cerr << "insertTuples: closing parentheses not read\n";
 }
 
 void attrList(insertData *inDataObj) {
@@ -55,8 +58,6 @@ void attrList(insertData *inDataObj) {
     inDataObj->field_names.push_back(string(attrNameBuf));
     if(readComma()){
       attrList(inDataObj);
-    }
-    if(readParen()){
     }
     return;
 }

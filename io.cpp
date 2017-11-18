@@ -59,7 +59,7 @@ void readWord(char *sbuf) {
 void readQuote() {
     char c;
     cin >> c;
-    if ((c != '\"') || (c != '\'')) {
+    if ((c != '"') && (c != '\'')) {
         cin.unget();
     }
 }
@@ -67,7 +67,7 @@ void readQuote() {
 bool readParen() {
     char c;
     cin >> c;
-    if ((c != '(') || (c != ')')) {
+    if ((c == '(') || (c == ')')) {
         return true;
     } else {
         cin.unget();
@@ -118,20 +118,14 @@ char readCompOp() {
         return '\0';
     }
 } 
-
 /*
 int main() {
     char *ptr;
     ptr = (char *)malloc(10*sizeof(char));
-    bool b =readPeriod();
-    // readWord(ptr);
-    if (b == true) {
-        cout << "Preriod read\n";
-    } else {
-        char c;
-        cin >> c;
-        cout << "Read character was " << c;
-    }
+    readQuote();
+    char c;
+    cin >> c;
+    cout << "Read character was " << c;
     return 0;
 }
 */
