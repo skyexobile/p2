@@ -59,10 +59,8 @@ int main() {
     readWord(stmtBuf);
     while(1) {
         /* call the corresponding subroutine */
-        if (strcmp(stmtBuf, "SELECT") == 0) {
-            // selectStmt(root);
-        }
-        else if (strcmp(stmtBuf, "CREATE") == 0){
+
+        if (strcmp(stmtBuf, "CREATE") == 0){
             readWord(stmtBuf);
             if (strcmp(stmtBuf, "TABLE") == 0){
                 createTableData crTableObj;
@@ -74,7 +72,18 @@ int main() {
                 Relation* relation_ptr=schema_manager.createRelation(crTableObj.relationName,schema);
                 tablePtrs[crTableObj.relationName] = relation_ptr;
             }
-        } else if (strcmp(stmtBuf, "INSERT") == 0){
+        }
+        else if(strcmp(stmtBuf, "DROP") == 0){
+          readWord(stmtBuf);
+          if (strcmp(stmtBuf, "TABLE") == 0){
+              char *tableNameBuf = (char *)malloc(10*sizeof(char));
+              tableName(tableNameBuf);
+              string relationName = string(tableNameBuf);
+              schema_manager.deleteRelation(relationName);
+              cout << "Dropped: "<< relationName << endl << "Current schema and relations:" << endl << schema_manager << endl;
+        }
+      }
+        else if (strcmp(stmtBuf, "INSERT") == 0){
             readWord(stmtBuf);
             if (strcmp(stmtBuf, "INTO") == 0) {
                 insertData inDataObj;
@@ -100,8 +109,28 @@ int main() {
                 cout << mem << endl;
                 cout << "Now the relation contains: " << endl;
                 cout << *(tablePtrs[inDataObj.relationName]) << endl << endl;
+                cout << "current schema and relations" << endl << schema_manager << endl;
 
             }
+        }
+        if (strcmp(stmtBuf, "SELECT") == 0) {
+            selectData selDataObj;
+            if(readStar())
+            {
+            selectStmt(&selDataObj);
+            cout << selDataObj << endl;
+          string tName = selDataObj.relation_names[0]; // assuming selecting from single table
+          cout << "Table " << tName  << " contains: "<< endl;
+          //memory block 0 contains:
+            for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
+              tablePtrs[tName]->getBlock(i,0);
+              Block* block_ptr = mem.getBlock(0);
+              vector<Tuple> tuples = block_ptr->getTuples();
+              copy(tuples.begin(),tuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
+            }
+          }
+
+
         }
         readWord(stmtBuf);
     }

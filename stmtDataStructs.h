@@ -54,4 +54,24 @@ class insertData {
           }
 };
 
+class selectData{
+  public:
+    vector<string> relation_names;
+    vector<string> column_names;
+    friend ostream& operator<< (ostream& out, const selectData& selDataObj) {
+        out << "relation_name: " << '\n';
+        for (const auto& i:selDataObj.relation_names) {
+            out << i << '\t';
+        }
+        out << '\n';
+        out << "column_name: " << '\n';
+        for (const auto& i:selDataObj.column_names) {
+            out << i << '\t';
+        }
+
+        out << '\n';
+        return out;
+      }
+};
+
 #endif

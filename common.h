@@ -6,7 +6,7 @@
 
 void tableName(char *tableNameBuf);
 void attrName(char *attrNameBuf);
-void columnName(node *parent);
+void columnName(char* colNameBuf);
 void printTree(node *curr, int indent);
 
 void term(node* parent);

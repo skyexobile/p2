@@ -3,111 +3,57 @@ using namespace std;
 #include <cstdlib>
 #include <cstring>
 #include "io.h"
-#include "parseTree.h"
+#include "stmtDataStructs.h"
 #include "common.h"
-void selSublist(node *);
+void selSublist(selectData *selDataObj);
 
-void tablelist(node *parent){
-  //create non-terminal table-list node
-  node *tablelistNode, *commaNode;
-  tablelistNode = new node("tablelist", false);
-  parent->subTree.push_back(tablelistNode);
-  tableName(tablelistNode);
+void tablelist(selectData *selDataObj){
+  char *tableNameBuf = (char*)malloc(10*sizeof(char));
+  tableName(tableNameBuf);
+  selDataObj->relation_names.push_back(string(tableNameBuf));
   //check if there is a comma ahead
-  char *comBuf = (char *)malloc(3*sizeof(char));
-  read(comBuf, true);
-  if(comBuf[0] ==  '\0'){
-    return;
-  }
-  else if (comBuf != nullptr) {
-      commaNode = new node(",", true);
-      tablelistNode-> subTree.push_back(commaNode);
-      tablelist(tablelistNode);
+  if(readComma()){
+    tablelist(selDataObj);
   }
   return;
-
 }
 
 
-void selSublist(node *parent) {
-  cout << "selSublist" << endl;
-
-    node *selSublistNode, *commaNode;
-    char *temp;
-    temp = (char *)malloc(20*sizeof(char));
-    selSublistNode = new node("selSublist", false);
-    parent -> subTree.push_back(selSublistNode);
-    columnName(selSublistNode);
-    read(temp, true);
-    if(strcmp(temp, ",") ==0){
-      commaNode = new node(",", true);
-      selSublistNode->subTree.push_back(commaNode);
-      selSublist(selSublistNode);
-    }
-
-    return;
-}
-
-void selList(node *parent) {
-  cout << "selList " << endl;
-    node *selListNode, *starNode;
-    selListNode = new node("selList", false);
-    parent -> subTree.push_back(selListNode);
-    char* c= (char *)malloc(3*sizeof(char));
-    read(c, true);
-    if(strcmp(c, "*") == 0){
-      starNode = new node("*", true);
-      selListNode->subTree.push_back(starNode);
-    }
-    else{
-
-    selSublist(selListNode);
-
-    return;
+void selSublist(selectData *selDataObj) {
+  char *colNameBuf;
+  colNameBuf = (char *)malloc(40*sizeof(char));
+  columnName(colNameBuf);
+  selDataObj->column_names.push_back(string(colNameBuf));
+  if(readComma()){
+      selSublist(selDataObj);
   }
+  return;
 }
 
-void selectStmt(node *parent) {
-    cout << "in selectStmt" << endl;
-    node *selNode, *dNode, *fromNode;
-    selNode = new node("SELECT", true);
-    parent -> subTree.push_back(selNode);
-    cout << "parent of selNode: " << parent;
-    //check distinct
+void selList(selectData *selDataObj) {
+  //check for star, otherwise select-sublist
+    selSublist(selDataObj);
+
+    return;
+
+}
+
+void selectStmt(selectData *selDataObj) {
     char* c= (char *)malloc(10*sizeof(char));
-    read(c, true);
-    if(strcmp(c,"*")==0){
-      putChar('*');
-
-        selList(parent);
+    readWord(c);
+    //for SELECT *, next word will be FROM
+    if(strcmp(c, "FROM") ==0){
+        tablelist(selDataObj);
+        return;
     }
-    else{
-        read(c, false);
-
-        if(strcmp(c, "DISTINCT") ==0){
-            dNode = new node("DISTINCT", true);
-            parent->subTree.push_back(dNode);
-        }
-        else{
-
-            putChar(' ');
-            for(int i =(strlen(c)-1); i>=0; i--){
-                putChar(c[i]);
-            }
-        }
-        selList(parent);
-
+    else if(strcmp(c, "DISTINCT")==0){
+      //something special for distinct
     }
-
+    selList(selDataObj);
     //check for "FROM"
-    read(c, false);
+    readWord(c);
     if(strcmp(c, "FROM") == 0){
-        fromNode = new node("FROM", true);
-        parent->subTree.push_back(fromNode);
-        cout << "parent of fromNode: " << parent;
-        tablelist(parent);
-    }
-    else{
+        tablelist(selDataObj);
     }
     return;
 }

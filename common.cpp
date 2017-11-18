@@ -9,36 +9,17 @@ using namespace std;
 #include "io.h"
 #include "stmtDataStructs.h"
 #define WIDTH 15
+void tableName(char *tableNameBuf);
 
-void columnName(node *parent){
-    node *colNameNode, *commaNode;
-    bool flgComma = false;
-    colNameNode = new node("colName", false);
-    parent->subTree.push_back(colNameNode);
-    char *temp, *attrName;
-    attrName = (char *)malloc(40*sizeof(char));
-    temp = (char *)malloc(3*sizeof(char));
-    readWord(temp);
-    strcpy(attrName, temp);
-    readPeriod();
-    if(temp != nullptr){
-      //we have read either a . or ,
-      if(strcmp(temp, "." ) == 0){
-        strcat(attrName, temp);
-        readWord(temp);
-        strcat(attrName, temp);
-      }
-      else if(strcmp(temp, ",") ==0){
-        flgComma = true;
-      }
+void columnName(char* colNameBuf){
+    char *temp, *tableName, *attrName;
+    colNameBuf = (char *)malloc(40*sizeof(char));
+    readWord(colNameBuf);
+    if(readPeriod()){
+      strcat(colNameBuf, ".");
+      readWord(temp);
+      strcat(colNameBuf, temp);
     }
-    node *atrNameNode;
-    atrNameNode = new node(attrName, true);
-    colNameNode -> subTree.push_back(atrNameNode);
-    if(flgComma){
-        putChar(',');
-    }
-
     return;
 }
 void attrName(char *attrNameBuf){
@@ -49,7 +30,7 @@ void attrName(char *attrNameBuf){
     return;
 }
 
-void tableName(char *tableNameBuf) {
+void tableName(char *tableNameBuf){
   readWord(tableNameBuf);
     if (!tableNameBuf[0]) {
         cerr << "tableName: tableName not read";
@@ -76,7 +57,7 @@ void term(node* parent){
     return;
   }
   //this is a columname
-  columnName(termNode);
+  columnName(temp);
   return;
 }
 void expression(node* parent){

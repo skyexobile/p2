@@ -2,6 +2,7 @@
 #include <stack>
 #include <ctype.h>
 #include <cstdlib>
+
 using namespace std;
 
 static stack<char> buffer;
@@ -41,14 +42,24 @@ void putChar(char c) {
 
 void readWord(char *sbuf) {
     char c;
+    cin.sync_with_stdio(false);
+
     cin >> c;
-    
     for (int i=0;; i++) {
         if (isalpha(c) || isdigit(c)) {
             sbuf[i] = c;
         } else {
+          if(c==' '){
+            sbuf[i] = '\0';
+            return;
+          }
+          if(c=='\0'){
+            sbuf[i] = '\0';
+
+            return;
+          }
             //at this point, we're going to find character at end of word, like a comma..so we want to push it back into buffer
-            cin.unget();
+            cin.putback(c);
             sbuf[i] = '\0';
             return;
         }
@@ -60,7 +71,7 @@ void readQuote() {
     char c;
     cin >> c;
     if ((c != '"') && (c != '\'')) {
-        cin.unget();
+        cin.putback(c);
     }
 }
 
@@ -70,7 +81,8 @@ bool readParen() {
     if ((c == '(') || (c == ')')) {
         return true;
     } else {
-        cin.unget();
+        cin.putback(c);
+        cin >> c;
         return false;
     }
 }
@@ -81,7 +93,7 @@ bool readStar() {
     if (c == '*') {
         return true;
     } else {
-        cin.unget();
+        cin.putback(c);
         return false;
     }
 }
@@ -92,7 +104,7 @@ bool readComma() {
     if (c == ',') {
         return true;
     } else {
-        cin.unget();
+        cin.putback(c);
         return false;
     }
 }
@@ -103,10 +115,10 @@ bool readPeriod() {
     if (c == '.') {
         return true;
     } else {
-        cin.unget();
+        cin.putback(c);
         return false;
     }
-} 
+}
 
 char readCompOp() {
     char c;
@@ -114,18 +126,19 @@ char readCompOp() {
     if ((c == '<') || (c == '>') ||  (c == '=')){
         return c;
     } else {
-        cin.unget();
+        cin.putback(c);
         return '\0';
     }
-} 
+
+}
 /*
 int main() {
     char *ptr;
     ptr = (char *)malloc(10*sizeof(char));
-    readQuote();
-    char c;
-    cin >> c;
-    cout << "Read character was " << c;
-    return 0;
-}
-*/
+    for(int i = 0; i<4; i++)
+    {
+      readWord(ptr);
+      cout << string(ptr) << endl;
+    }
+
+}*/
