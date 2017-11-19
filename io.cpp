@@ -49,6 +49,7 @@ void readWord(char *sbuf) {
         if (isalpha(c) || isdigit(c)) {
             sbuf[i] = c;
         } else {
+            /* 
           if(c==' '){
             sbuf[i] = '\0';
             return;
@@ -58,6 +59,7 @@ void readWord(char *sbuf) {
 
             return;
           }
+          */
             //at this point, we're going to find character at end of word, like a comma..so we want to push it back into buffer
             cin.putback(c);
             sbuf[i] = '\0';

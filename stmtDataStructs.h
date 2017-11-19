@@ -13,6 +13,7 @@ class createTableData {
     vector<enum FIELD_TYPE> field_types;
     string relationName;
     friend ostream& operator<< (ostream& out, const createTableData& crTableObj) {
+        out << "crTableObj" << endl;
         out << "relation name: " << crTableObj.relationName << '\n';
         out << "field_names: " << '\n';
         for (const auto& i:crTableObj.field_names) {
@@ -39,6 +40,7 @@ class insertData {
         string relationName;
 
         friend ostream& operator<< (ostream& out, const insertData& inDataObj) {
+            out << "inDataObj" << endl;
             out << "field name: " << '\n';
             for (const auto& i:inDataObj.field_names) {
                 out << i << '\t';
@@ -59,12 +61,13 @@ class selectData{
     vector<string> relation_names;
     vector<string> column_names;
     friend ostream& operator<< (ostream& out, const selectData& selDataObj) {
-        out << "relation_name: " << '\n';
+        out << "selDataObj" << endl;
+        out << "relation_names: " << '\n';
         for (const auto& i:selDataObj.relation_names) {
             out << i << '\t';
         }
         out << '\n';
-        out << "column_name: " << '\n';
+        out << "column_names: " << '\n';
         for (const auto& i:selDataObj.column_names) {
             out << i << '\t';
         }

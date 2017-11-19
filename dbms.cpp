@@ -57,7 +57,7 @@ int main() {
     char *stmtBuf, *stmtBuf2;
     stmtBuf= (char *)malloc(10*sizeof(char));
     readWord(stmtBuf);
-    while(1) {
+    while(stmtBuf[0] != '0') {
         /* call the corresponding subroutine */
 
         if (strcmp(stmtBuf, "CREATE") == 0){
@@ -99,7 +99,7 @@ int main() {
                         int fvInteger = stoi(fieldValue);
                         tuple.setField(inDataObj.field_names[i],fvInteger);
                     }
-                    else{
+                    else {
                         tuple.setField(inDataObj.field_names[i],inDataObj.field_values[i]);
                     }
                 }
@@ -112,55 +112,55 @@ int main() {
                 //cout << "current schema and relations" << endl << schema_manager << endl;
 
             }
-        }
-        if (strcmp(stmtBuf, "SELECT") == 0) {
+        } else if (strcmp(stmtBuf, "SELECT") == 0) {
             selectData selDataObj;
             if(readStar())
             {
-            selectStmt(&selDataObj);
-            cout << selDataObj << endl;
-          string tName = selDataObj.relation_names[0]; // assuming selecting from single table
-          cout << "Table " << tName  << " contains: "<< endl;
-          //memory block 0 contains:
-            for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
-              tablePtrs[tName]->getBlock(i,0);
-              Block* block_ptr = mem.getBlock(0);
-              vector<Tuple> tuples = block_ptr->getTuples();
-              copy(tuples.begin(),tuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
+                selectStmt(&selDataObj);
+                cout << selDataObj << endl;
+                string tName = selDataObj.relation_names[0]; // assuming selecting from single table
+                cout << "Table " << tName  << " contains: "<< endl;
+                //memory block 0 contains:
+                for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
+                    tablePtrs[tName]->getBlock(i,0);
+                    Block* block_ptr = mem.getBlock(0);
+                    vector<Tuple> tuples = block_ptr->getTuples();
+                    copy(tuples.begin(),tuples.end(),ostream_iterator<Tuple>(cout,"\n"));
+                }
+                cout << endl;
             }
-          }
             else{
-              selectStmt(&selDataObj);
-              cout << selDataObj << endl;
-              string tName = selDataObj.relation_names[0]; // assuming selecting from single table
-              cout << "Attributes selected: " << endl;
-              for (const auto& i:selDataObj.column_names) {
+                selectStmt(&selDataObj);
+                cout << selDataObj << endl;
+                string tName = selDataObj.relation_names[0]; // assuming selecting from single table
+                cout << "Attributes selected: " << endl;
+                for (const auto& i:selDataObj.column_names) {
                     cout << i << '\t';
                 }
-              cout << endl;
+                cout << endl;
 
-              cout << "Table " << tName  << " contains: "<< endl;
-              //memory block 0 contains:
-              for (const auto& j:selDataObj.column_names) {
+                cout << "Table " << tName  << " contains: "<< endl;
+                //memory block 0 contains:
+                for (const auto& j:selDataObj.column_names) {
 
-                for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
-                  tablePtrs[tName]->getBlock(i,0);
-                  Block* block_ptr = mem.getBlock(0);
-                  vector<Tuple> tuples = block_ptr->getTuples();
+                    for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
+                        tablePtrs[tName]->getBlock(i,0);
+                        Block* block_ptr = mem.getBlock(0);
+                        vector<Tuple> tuples = block_ptr->getTuples();
 
-                          for (const auto& i:tuples) {
-                                Schema tuple_schema = i.getSchema();
-                          string fieldName = j;
-                          if (tuple_schema.getFieldType(j)==INT){
-                            cout << i.getField(fieldName).integer << "\t";
-                          }
-                          else{
-                            cout << *(i.getField(fieldName).str) << "\t";
-                          }
-                        cout << endl;
+                        for (const auto& i:tuples) {
+                            Schema tuple_schema = i.getSchema();
+                            string fieldName = j;
+                            if (tuple_schema.getFieldType(j)==INT){
+                                cout << i.getField(fieldName).integer << "\t";
+                            }
+                            else{
+                                cout << *(i.getField(fieldName).str) << "\t";
+                            }
+                            cout << endl;
+                        }
                     }
-                  }
-                  //copy(tuples.begin(),tuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
+                    //copy(tuples.begin(),tuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
                 }//143 forloop end
             }
         }
