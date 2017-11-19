@@ -12,8 +12,8 @@ using namespace std;
 void tableName(char *tableNameBuf);
 
 void columnName(char* colNameBuf){
+  cout << "columnName" << endl;
     char *temp, *tableName, *attrName;
-    colNameBuf = (char *)malloc(40*sizeof(char));
     readWord(colNameBuf);
     if(readPeriod()){
       strcat(colNameBuf, ".");

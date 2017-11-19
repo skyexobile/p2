@@ -10,6 +10,7 @@ void selSublist(selectData *selDataObj);
 void tablelist(selectData *selDataObj){
   char *tableNameBuf = (char*)malloc(10*sizeof(char));
   tableName(tableNameBuf);
+  cout << "table is : "<<string(tableNameBuf) <<endl;
   selDataObj->relation_names.push_back(string(tableNameBuf));
   //check if there is a comma ahead
   if(readComma()){
@@ -21,8 +22,11 @@ void tablelist(selectData *selDataObj){
 
 void selSublist(selectData *selDataObj) {
   char *colNameBuf;
-  colNameBuf = (char *)malloc(40*sizeof(char));
+  colNameBuf = (char *)malloc(20*sizeof(char));
   columnName(colNameBuf);
+  if (!colNameBuf[0]) {
+      cerr << "colName: colName not read";
+  }
   selDataObj->column_names.push_back(string(colNameBuf));
   if(readComma()){
       selSublist(selDataObj);
@@ -49,11 +53,20 @@ void selectStmt(selectData *selDataObj) {
     else if(strcmp(c, "DISTINCT")==0){
       //something special for distinct
     }
+    else{
+      cin.putback(' '); // need this otherwise col name and FROM will be combined
+
+      //just read in first column name...
+      for(int i = strlen(c)-1; i >=0; i--){
+      cin.putback(c[i]);
+    }
+    }
     selList(selDataObj);
     //check for "FROM"
     readWord(c);
     if(strcmp(c, "FROM") == 0){
         tablelist(selDataObj);
     }
+
     return;
 }

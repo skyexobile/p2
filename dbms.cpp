@@ -109,7 +109,7 @@ int main() {
                 cout << mem << endl;
                 cout << "Now the relation contains: " << endl;
                 cout << *(tablePtrs[inDataObj.relationName]) << endl << endl;
-                cout << "current schema and relations" << endl << schema_manager << endl;
+                //cout << "current schema and relations" << endl << schema_manager << endl;
 
             }
         }
@@ -129,8 +129,40 @@ int main() {
               copy(tuples.begin(),tuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
             }
           }
+            else{
+              selectStmt(&selDataObj);
+              cout << selDataObj << endl;
+              string tName = selDataObj.relation_names[0]; // assuming selecting from single table
+              cout << "Attributes selected: " << endl;
+              for (const auto& i:selDataObj.column_names) {
+                    cout << i << '\t';
+                }
+              cout << endl;
 
+              cout << "Table " << tName  << " contains: "<< endl;
+              //memory block 0 contains:
+              for (const auto& j:selDataObj.column_names) {
 
+                for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
+                  tablePtrs[tName]->getBlock(i,0);
+                  Block* block_ptr = mem.getBlock(0);
+                  vector<Tuple> tuples = block_ptr->getTuples();
+
+                          for (const auto& i:tuples) {
+                                Schema tuple_schema = i.getSchema();
+                          string fieldName = j;
+                          if (tuple_schema.getFieldType(j)==INT){
+                            cout << i.getField(fieldName).integer << "\t";
+                          }
+                          else{
+                            cout << *(i.getField(fieldName).str) << "\t";
+                          }
+                        cout << endl;
+                    }
+                  }
+                  //copy(tuples.begin(),tuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
+                }//143 forloop end
+            }
         }
         readWord(stmtBuf);
     }
