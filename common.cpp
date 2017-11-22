@@ -12,7 +12,6 @@ using namespace std;
 void tableName(char *tableNameBuf);
 
 void columnName(char* colNameBuf){
-  cout << "columnName" << endl;
     char *temp, *tableName, *attrName;
     readWord(colNameBuf);
     if(readPeriod()){

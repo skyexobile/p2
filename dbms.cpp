@@ -66,7 +66,6 @@ int main() {
             if (strcmp(stmtBuf, "TABLE") == 0){
                 createTableData crTableObj;
                 createTable(&crTableObj);
-                cout << crTableObj << endl;
                 vector<enum FIELD_TYPE> field_types;
 
                 Schema schema(crTableObj.field_names,crTableObj.field_types);
@@ -89,7 +88,6 @@ int main() {
             if (strcmp(stmtBuf, "INTO") == 0) {
                 insertData inDataObj;
                 insertStmt(&inDataObj);
-                cout << inDataObj << endl;
                 //create tuple
                 Tuple tuple = tablePtrs[inDataObj.relationName]->createTuple();
                 //check to see how many fields to add
@@ -118,7 +116,6 @@ int main() {
             if(readStar())
             {
                 selectStmt(&selDataObj);
-                cout << selDataObj << endl;
                 string tName = selDataObj.relation_names[0]; // assuming selecting from single table
                 cout << "Table " << tName  << " contains: "<< endl;
                 //memory block 0 contains:
@@ -132,7 +129,6 @@ int main() {
             }
             else{
                 selectStmt(&selDataObj);
-                cout << selDataObj << endl;
                 string tName = selDataObj.relation_names[0]; // assuming selecting from single table
                 cout << "Attributes selected: " << endl;
                 for (const auto& i:selDataObj.column_names) {
@@ -145,7 +141,7 @@ int main() {
                 Block* block_ptr = mem.getBlock(0);
                 vector<Tuple> tuples = block_ptr->getTuples();
                 Schema tuple_schema = tuples[0].getSchema();
-                cout << "Creating a schema" << endl;
+                //Creating a schema
                 vector<string> field_names;
                 vector<enum FIELD_TYPE> field_types;
                 for (const auto& j:selDataObj.column_names) {
@@ -160,13 +156,12 @@ int main() {
                 }
                 Schema selSchema(field_names,field_types);
                 Relation* relation_ptr=schema_manager.createRelation("selRelation",selSchema);
+                Tuple selTuple = relation_ptr->createTuple();
 
                 for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
                     tablePtrs[tName]->getBlock(i,0);
                     block_ptr = mem.getBlock(0);
                     tuples = block_ptr->getTuples();
-                    Tuple selTuple = relation_ptr->createTuple();
-
                      for (const auto& j:selDataObj.column_names) {
                           string fieldName = j;
                           for (const auto& i:tuples) {
@@ -182,9 +177,10 @@ int main() {
 
                   }
                   selTuples.push_back(selTuple);
-                  copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
                 }//143 forloop end
+                copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
             }
+
         }
         readWord(stmtBuf);
     }
