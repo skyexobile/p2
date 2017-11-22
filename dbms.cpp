@@ -20,6 +20,7 @@ using namespace std;
 #include "Tuple.h"
 #include <unordered_map>
 #include <iterator>
+#include<sstream>
 
 void appendTupleToRelation(Relation* relation_ptr, MainMemory& mem, int memory_block_index, Tuple& tuple) {
     Block* block_ptr;
@@ -139,28 +140,49 @@ int main() {
                 }
                 cout << endl;
 
-                cout << "Table " << tName  << " contains: "<< endl;
+                vector<Tuple> selTuples;
                 //memory block 0 contains:
+                Block* block_ptr = mem.getBlock(0);
+                vector<Tuple> tuples = block_ptr->getTuples();
+                Schema tuple_schema = tuples[0].getSchema();
+                cout << "Creating a schema" << endl;
+                vector<string> field_names;
+                vector<enum FIELD_TYPE> field_types;
                 for (const auto& j:selDataObj.column_names) {
+                   field_names.push_back(j);
+                   if (tuple_schema.getFieldType(j)==INT){
+                     field_types.push_back(INT);
+                   }
 
-                    for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
-                        tablePtrs[tName]->getBlock(i,0);
-                        Block* block_ptr = mem.getBlock(0);
-                        vector<Tuple> tuples = block_ptr->getTuples();
+                   else{
+                   field_types.push_back(STR20);
+                  }
+                }
+                Schema selSchema(field_names,field_types);
+                Relation* relation_ptr=schema_manager.createRelation("selRelation",selSchema);
 
-                        for (const auto& i:tuples) {
-                            Schema tuple_schema = i.getSchema();
-                            string fieldName = j;
-                            if (tuple_schema.getFieldType(j)==INT){
-                                cout << i.getField(fieldName).integer << "\t";
-                            }
-                            else{
-                                cout << *(i.getField(fieldName).str) << "\t";
-                            }
-                            cout << endl;
-                        }
-                    }
-                    //copy(tuples.begin(),tuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
+                for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
+                    tablePtrs[tName]->getBlock(i,0);
+                    block_ptr = mem.getBlock(0);
+                    tuples = block_ptr->getTuples();
+                    Tuple selTuple = relation_ptr->createTuple();
+
+                     for (const auto& j:selDataObj.column_names) {
+                          string fieldName = j;
+                          for (const auto& i:tuples) {
+                          if (tuple_schema.getFieldType(j)==INT){
+                              int val = i.getField(fieldName).integer;
+                              selTuple.setField(fieldName,val);
+                          }
+                          else{
+                              string name = *i.getField(fieldName).str;
+                              selTuple.setField(fieldName, name);
+                          }
+                      }
+
+                  }
+                  selTuples.push_back(selTuple);
+                  copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
                 }//143 forloop end
             }
         }
