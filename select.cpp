@@ -6,6 +6,7 @@ using namespace std;
 #include "stmtDataStructs.h"
 #include "common.h"
 void selSublist(selectData *selDataObj);
+node *createTree(char *searchStrBuf);
 
 void tablelist(selectData *selDataObj){
   char *tableNameBuf = (char*)malloc(10*sizeof(char));
@@ -64,6 +65,14 @@ void selectStmt(selectData *selDataObj) {
     if(strcmp(c, "FROM") == 0){
         tablelist(selDataObj);
     }
+    readWord(c);
+    if(strcmp(c, "WHERE") == 0) {
+        char *searchStrBuf;
+        node *root;
+        searchStrBuf = (char *)malloc(100*sizeof(char));
+        root = createTree(searchStrBuf);
+    }
+
 
     return;
 }

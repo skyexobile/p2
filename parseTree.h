@@ -7,18 +7,11 @@ using namespace std;
 
 class node {
     public:
-    string nodeName;
-    bool isTermNode;
+    string nodeType;
     vector<node *> subTree;
 
-   // node() {}
-    node(string strNodeName, bool isTerm) {
-        nodeName = strNodeName;
-        if (isTerm) {
-            isTermNode = true;
-        } else {
-            isTermNode = false;
-        }
+    node(string strNodeType) {
+        nodeType = strNodeType;
     }
 };
 
