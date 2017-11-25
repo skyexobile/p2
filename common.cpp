@@ -8,7 +8,7 @@ using namespace std;
 #include "parseTree.h"
 #include "io.h"
 #include "stmtDataStructs.h"
-#define WIDTH 15
+#define WIDTH 5
 void tableName(char *tableNameBuf);
 
 void columnName(char* colNameBuf){
@@ -40,7 +40,7 @@ void tableName(char *tableNameBuf){
 void printTree(node* curr, int indent) {
     cout << setw(WIDTH*indent) << curr->nodeType << endl;
     vector<node *> vectChildNodes;
-    vectChildNodes = curr -> subTree;
+    vectChildNodes = curr->subTree;
     if (!vectChildNodes.empty()) {
         for (auto& nodeptr:vectChildNodes) {
             printTree(nodeptr, indent+1);

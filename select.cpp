@@ -71,8 +71,11 @@ void selectStmt(selectData *selDataObj) {
         node *root;
         searchStrBuf = (char *)malloc(100*sizeof(char));
         root = createTree(searchStrBuf);
+    } else {
+        for(int i = strlen(c)-1; i >=0; i--){
+            cin.putback(c[i]);
+        }
     }
-
 
     return;
 }

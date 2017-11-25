@@ -3,6 +3,7 @@
 #include <sstream>
 using namespace std;
 #include "parseTree.h"
+#include "common.h"
 
 string switchDelimiter(string delimiter) {
     char delim;
@@ -70,14 +71,24 @@ node *createTree(char *searchStrBuf) {
     stringstream ss(str);
     vector<string> tokens;
     while(ss >> buf) {
-        tokens.push_back(buf);
+        if ((buf != ")") && (buf != "(")) {
+            tokens.push_back(buf);
+        }
     }
     node *root = new node("searchTreeRoot");
     recursiveSplit(root, tokens, "OR");
     return root;
 }
 
-
-
+/*
+int main() {
+    char *buf;
+    node *root;
+    buf = (char *)malloc(50*sizeof(char));
+    fgets(buf,50,stdin);
+    root = createTree(buf);
+    printTree(root, 0);
+}
+*/
 
 

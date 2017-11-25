@@ -58,7 +58,7 @@ int main() {
     char *stmtBuf, *stmtBuf2;
     stmtBuf= (char *)malloc(10*sizeof(char));
     readWord(stmtBuf);
-    while(stmtBuf[0] != '0') {
+    while(stmtBuf[0] != 'Q') {
         /* call the corresponding subroutine */
 
         if (strcmp(stmtBuf, "CREATE") == 0){
@@ -162,6 +162,8 @@ int main() {
                     tablePtrs[tName]->getBlock(i,0);
                     block_ptr = mem.getBlock(0);
                     tuples = block_ptr->getTuples();
+                    // Evaluate the tuples based on the where clause
+                    
                      for (const auto& j:selDataObj.column_names) {
                           string fieldName = j;
                           for (const auto& i:tuples) {
