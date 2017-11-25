@@ -162,21 +162,35 @@ int main() {
                 Schema selSchema(field_names,field_types);
                 Relation* relation_ptr=schema_manager.createRelation("selRelation",selSchema);
                 Tuple selTuple = relation_ptr->createTuple();
+
+                //Read the blocks into memory 10 blocks at a time
                 for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i+=10){
                   //bool Relation::getBlocks(int relation_block_index, int memory_block_index, int num_blocks)
-                  tablePtrs[tName]->getBlocks(0,i,tablePtrs[tName]->getNumOfBlocks());
+                  tablePtrs[tName]->getBlocks(i,0,tablePtrs[tName]->getNumOfBlocks());
                   cout << "Now the unsorted memory contains: " << endl;
                   cout << mem << endl;
                   // MainMemory::getTuples(int memory_block_begin,int num_blocks)
                       //gets tuples from a range of blocks
                   //Issue: blocks are not filling up when tuples are inserted
                     //i.e., each block contains one tuple instead of 2
+                  //Sort the tuples in the 10 blocks
                   vector<Tuple> sort_tuples = mem.getTuples(0, block_ptr->getNumTuples()*tablePtrs[tName]->getNumOfBlocks());
                   //need to figure out what we're sorting by for wayToSort
                   sort(sort_tuples.begin(), sort_tuples.end(), wayToSort);
                   mem.setTuples(0,sort_tuples);
                   cout << "Now the sorted memory contains: " << endl;
                   cout << mem << endl;
+                  //Write the sublists back onto disk but make sure to store the starting index of the sublist
+                  //bool Relation::setBlocks(int relation_block_index, int memory_block_index, int num_blocks)
+                  tablePtrs[tName]->setBlocks(i, 0, 10);
+                  //Read the first block of each sublist into memory → getBlock()
+                  //Reading the i block of the relation into memory" << endl;
+                  for (int j = 0; j< tablePtrs[tName]->getNumOfBlocks(); j++){
+                  tablePtrs[tName]->getBlock(i,j);
+                  }
+                  cout << *tablePtrs[tName] << endl;
+
+                  //Find the minimum among the smallest tuples in each sublist and output it → getTuples(), compare the smallest in each tuple vector using the compare function defined for sort.
 
                 }
 
