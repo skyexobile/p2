@@ -21,6 +21,11 @@ using namespace std;
 #include <unordered_map>
 #include <iterator>
 #include<sstream>
+#include<algorithm>
+
+bool wayToSort( Tuple const& a, Tuple const& b) {
+  return a.getField("homework").integer < b.getField("homework").integer;
+}
 
 void appendTupleToRelation(Relation* relation_ptr, MainMemory& mem, int memory_block_index, Tuple& tuple) {
     Block* block_ptr;
@@ -58,7 +63,7 @@ int main() {
     char *stmtBuf, *stmtBuf2;
     stmtBuf= (char *)malloc(10*sizeof(char));
     readWord(stmtBuf);
-    while(stmtBuf[0] != 'Q') {
+    while(stmtBuf[0] != '0') {
         /* call the corresponding subroutine */
 
         if (strcmp(stmtBuf, "CREATE") == 0){
@@ -157,13 +162,32 @@ int main() {
                 Schema selSchema(field_names,field_types);
                 Relation* relation_ptr=schema_manager.createRelation("selRelation",selSchema);
                 Tuple selTuple = relation_ptr->createTuple();
+                for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i+=10){
+                  //bool Relation::getBlocks(int relation_block_index, int memory_block_index, int num_blocks)
+                  tablePtrs[tName]->getBlocks(0,i,tablePtrs[tName]->getNumOfBlocks());
+                  cout << "Now the unsorted memory contains: " << endl;
+                  cout << mem << endl;
+                  // MainMemory::getTuples(int memory_block_begin,int num_blocks)
+                      //gets tuples from a range of blocks
+                  //Issue: blocks are not filling up when tuples are inserted
+                    //i.e., each block contains one tuple instead of 2
+                  vector<Tuple> sort_tuples = mem.getTuples(0, block_ptr->getNumTuples()*tablePtrs[tName]->getNumOfBlocks());
+                  //need to figure out what we're sorting by for wayToSort
+                  sort(sort_tuples.begin(), sort_tuples.end(), wayToSort);
+                  mem.setTuples(0,sort_tuples);
+                  cout << "Now the sorted memory contains: " << endl;
+                  cout << mem << endl;
+
+                }
 
                 for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
                     tablePtrs[tName]->getBlock(i,0);
                     block_ptr = mem.getBlock(0);
                     tuples = block_ptr->getTuples();
+
+
                     // Evaluate the tuples based on the where clause
-                    
+
                      for (const auto& j:selDataObj.column_names) {
                           string fieldName = j;
                           for (const auto& i:tuples) {
@@ -184,6 +208,7 @@ int main() {
             }
 
         }
+        //sort
         readWord(stmtBuf);
     }
 }
