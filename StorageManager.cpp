@@ -908,7 +908,7 @@ vector<Tuple> MainMemory::getTuples(int memory_block_begin,int num_blocks) const
   Schema s = blocks[memory_block_begin].getTuples()[0].getSchema();
   for (int i=memory_block_begin;i<memory_block_begin+num_blocks;i++) {
     vector<Tuple> tuples2=blocks[i].getTuples();
-    if (tuples2[0].getSchema() != s) {
+    if (!tuples2.empty() && tuples2[0].getSchema() != s) {
       cerr << "getTuples ERROR: schema at memory block " << i << " has a different schema" << endl;
       return vector<Tuple>();
     }

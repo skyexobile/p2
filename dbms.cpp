@@ -60,7 +60,7 @@ int main() {
     unordered_map<string, Relation *> tablePtrs;
 
     /* read the first word to check the type of statement */
-    char *stmtBuf, *stmtBuf2;
+    char *stmtBuf;
     stmtBuf= (char *)malloc(10*sizeof(char));
     readWord(stmtBuf);
     while(stmtBuf[0] != '0') {
@@ -163,10 +163,15 @@ int main() {
                 Relation* relation_ptr=schema_manager.createRelation("selRelation",selSchema);
                 Tuple selTuple = relation_ptr->createTuple();
 
+                int numBlocks = tablePtrs[tName]->getNumOfBlocks();
                 //Read the blocks into memory 10 blocks at a time
-                for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i+=10){
+                for(int i = 0; i < numBlocks; i+=10){
                   //bool Relation::getBlocks(int relation_block_index, int memory_block_index, int num_blocks)
-                  tablePtrs[tName]->getBlocks(i,0,tablePtrs[tName]->getNumOfBlocks());
+                    if (numBlocks-i >= 10) {
+                        tablePtrs[tName]->getBlocks(i,0,10);
+                    } else {
+                        tablePtrs[tName]->getBlocks(i,0,numBlocks-i);
+                    }
                   cout << "Now the unsorted memory contains: " << endl;
                   cout << mem << endl;
                   // MainMemory::getTuples(int memory_block_begin,int num_blocks)
@@ -174,7 +179,7 @@ int main() {
                   //Issue: blocks are not filling up when tuples are inserted
                     //i.e., each block contains one tuple instead of 2
                   //Sort the tuples in the 10 blocks
-                  vector<Tuple> sort_tuples = mem.getTuples(0, block_ptr->getNumTuples()*tablePtrs[tName]->getNumOfBlocks());
+                  vector<Tuple> sort_tuples = mem.getTuples(0, 10);
                   //need to figure out what we're sorting by for wayToSort
                   sort(sort_tuples.begin(), sort_tuples.end(), wayToSort);
                   mem.setTuples(0,sort_tuples);
@@ -182,11 +187,15 @@ int main() {
                   cout << mem << endl;
                   //Write the sublists back onto disk but make sure to store the starting index of the sublist
                   //bool Relation::setBlocks(int relation_block_index, int memory_block_index, int num_blocks)
-                  tablePtrs[tName]->setBlocks(i, 0, 10);
+                    if (numBlocks-i >= 10) {
+                        tablePtrs[tName]->setBlocks(i,0,10);
+                    } else {
+                        tablePtrs[tName]->setBlocks(i,0,numBlocks-i);
+                    }
                   //Read the first block of each sublist into memory → getBlock()
                   //Reading the i block of the relation into memory" << endl;
                   for (int j = 0; j< tablePtrs[tName]->getNumOfBlocks(); j++){
-                  tablePtrs[tName]->getBlock(i,j);
+                  //tablePtrs[tName]->getBlock(i,j);
                   }
                   cout << *tablePtrs[tName] << endl;
 
@@ -198,9 +207,6 @@ int main() {
                     tablePtrs[tName]->getBlock(i,0);
                     block_ptr = mem.getBlock(0);
                     tuples = block_ptr->getTuples();
-
-
-                    // Evaluate the tuples based on the where clause
 
                      for (const auto& j:selDataObj.column_names) {
                           string fieldName = j;
@@ -216,6 +222,7 @@ int main() {
                       }
 
                   }
+                    // Evaluate selTuple based on the where clause and select it if it satisfies the condition
                   selTuples.push_back(selTuple);
                 }//143 forloop end
                 copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));

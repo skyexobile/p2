@@ -80,7 +80,6 @@ node *createTree(char *searchStrBuf) {
     return root;
 }
 
-/*
 int main() {
     char *buf;
     node *root;
@@ -89,6 +88,5 @@ int main() {
     root = createTree(buf);
     printTree(root, 0);
 }
-*/
 
 
