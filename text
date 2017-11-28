@@ -3,6 +3,7 @@ INSERT INTO course (sid, homework, project, exam, grade) VALUES (1, 99, 100, 100
 INSERT INTO course (sid, homework, project, exam, grade) VALUES (2, NULL, 100, 100, "E")
 INSERT INTO course (sid, grade, exam, project, homework) VALUES (3, "E", 100, 100, 100)
 SELECT sid, homework FROM course
+0
 SELECT * FROM course
 INSERT INTO course (sid, homework, project, exam, grade) VALUES (4, 99, 100, 100, "B")
 SELECT * FROM course
@@ -32,5 +33,4 @@ INSERT INTO course (sid, homework, project, exam, grade) VALUES (16, 0, 0, 0, "E
 INSERT INTO course (sid, homework, project, exam, grade) VALUES (16, 0, 0, 0, "E")
 INSERT INTO course (sid, homework, project, exam, grade) VALUES (16, 0, 0, 0, "E")
 SELECT * FROM course
-SELECT sid, homework FROM course
 0

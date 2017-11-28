@@ -9,6 +9,7 @@ using namespace std;
 #include "createTable.h"
 #include "parseTree.h"
 #include "stmtDataStructs.h"
+#include "searchCondition.h"
 #include "Block.h"
 #include "Config.h"
 #include "Disk.h"
@@ -118,31 +119,36 @@ int main() {
             }
         } else if (strcmp(stmtBuf, "SELECT") == 0) {
             selectData selDataObj;
+            node *searchTreeRoot;
+            vector<Tuple> selTuples;
             if(readStar())
             {
-                selectStmt(&selDataObj);
+                searchTreeRoot = selectStmt(&selDataObj);
                 string tName = selDataObj.relation_names[0]; // assuming selecting from single table
                 cout << "Table " << tName  << " contains: "<< endl;
-                //memory block 0 contains:
                 for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
                     tablePtrs[tName]->getBlock(i,0);
                     Block* block_ptr = mem.getBlock(0);
                     vector<Tuple> tuples = block_ptr->getTuples();
-                    copy(tuples.begin(),tuples.end(),ostream_iterator<Tuple>(cout,"\n"));
+                    for (const auto& t:tuples) {
+                        if (searchTreeRoot != nullptr) {
+                            if(evalBool(searchTreeRoot->subTree[0], t)) {
+                                selTuples.push_back(t);
+                            }
+                        }
+                    }
                 }
+                copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
                 cout << endl;
             }
             else{
-                selectStmt(&selDataObj);
+                searchTreeRoot = selectStmt(&selDataObj);
                 string tName = selDataObj.relation_names[0]; // assuming selecting from single table
                 cout << "Attributes selected: " << endl;
                 for (const auto& i:selDataObj.column_names) {
                     cout << i << '\t';
                 }
                 cout << endl;
-
-                vector<Tuple> selTuples;
-                //memory block 0 contains:
                 Block* block_ptr = mem.getBlock(0);
                 vector<Tuple> tuples = block_ptr->getTuples();
                 Schema tuple_schema = tuples[0].getSchema();
@@ -208,23 +214,28 @@ int main() {
                     block_ptr = mem.getBlock(0);
                     tuples = block_ptr->getTuples();
 
-                     for (const auto& j:selDataObj.column_names) {
-                          string fieldName = j;
-                          for (const auto& i:tuples) {
-                          if (tuple_schema.getFieldType(j)==INT){
-                              int val = i.getField(fieldName).integer;
-                              selTuple.setField(fieldName,val);
-                          }
-                          else{
-                              string name = *i.getField(fieldName).str;
-                              selTuple.setField(fieldName, name);
-                          }
-                      }
+                    for (const auto& t:tuples) {
+                        for (const auto& j:selDataObj.column_names) {
+                            string fieldName = j;
+                            if (tuple_schema.getFieldType(j)==INT){
+                                int val = t.getField(fieldName).integer;
+                                selTuple.setField(fieldName,val);
+                            }
+                            else{
+                                string name = *t.getField(fieldName).str;
+                                selTuple.setField(fieldName, name);
+                            }
+                        }
+                        // Evaluate selTuple based on the where clause and select it if it satisfies the condition
+                        if (searchTreeRoot != nullptr) {
+                            // where clause in the statement
+                            if (evalBool(searchTreeRoot->subTree[0], t)) {
+                                selTuples.push_back(selTuple);
+                            }
+                        }
+                    }
 
-                  }
-                    // Evaluate selTuple based on the where clause and select it if it satisfies the condition
-                  selTuples.push_back(selTuple);
-                }//143 forloop end
+                }
                 copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
             }
 

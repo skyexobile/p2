@@ -5,7 +5,6 @@
 void columnName(selectData *selDataObj);
 void selSublist(selectData *selDataObj);
 void selList(selectData *selDataObj);
-void selectStmt(selectData *selDataObj);
-
+node* selectStmt(selectData *selDataObj);
 
 #endif

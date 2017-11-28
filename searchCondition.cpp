@@ -6,16 +6,8 @@ using namespace std;
 #include "parseTree.h"
 #include "common.h"
 #include "io.h"
-#include "Block.h"
-#include "Config.h"
-#include "Disk.h"
-#include "Field.h"
-#include "MainMemory.h"
-#include "Relation.h"
-#include "Schema.h"
-#include "SchemaManager.h"
 #include "Tuple.h"
-
+#include "Schema.h"
 
 string switchDelimiter(string delimiter) {
     char delim;
@@ -179,22 +171,6 @@ bool evalBool(node *root, Tuple selTuple) {
         }
         return false;
     }
-}
-
-
-
-
-
-int main() {
-    char *buf;
-    node *root;
-    buf = (char *)malloc(50*sizeof(char));
-    fgets(buf,50,stdin);
-    root = createTree(buf);
-    printTree(root, 0);
-    Tuple tuple;
-    bool ans = evalBool(root->subTree[0], tuple);
-    cout << ans << endl;
 }
 
 

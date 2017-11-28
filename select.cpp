@@ -42,22 +42,36 @@ void selList(selectData *selDataObj) {
 
 }
 
-void selectStmt(selectData *selDataObj) {
+node* selectStmt(selectData *selDataObj) {
     char* c= (char *)malloc(10*sizeof(char));
     readWord(c);
     //for SELECT *, next word will be FROM
     if(strcmp(c, "FROM") ==0){
         tablelist(selDataObj);
-        return;
+        readWord(c);
+        if(strcmp(c, "WHERE") == 0) {
+            char *searchStrBuf;
+            node *root;
+            searchStrBuf = (char *)malloc(100*sizeof(char));
+            root = createTree(searchStrBuf);
+            return root;
+        }
+        for(int i = strlen(c)-1; i >=0; i--){
+            cin.putback(c[i]);
+        }
+        // select statement without the where clause
+        return nullptr;
     }
-    else if(strcmp(c, "DISTINCT")==0){
-      //something special for distinct
+
+    // We don't have a star
+    if(strcmp(c, "DISTINCT")==0){
+        //something special for distinct
     }
     else{
-      //just read in first column name...
-      for(int i = strlen(c)-1; i >=0; i--){
-      cin.putback(c[i]);
-    }
+        //just read in first column name... so put it back into the stream
+        for(int i = strlen(c)-1; i >=0; i--){
+            cin.putback(c[i]);
+        }
     }
     selList(selDataObj);
     //check for "FROM"
@@ -71,11 +85,12 @@ void selectStmt(selectData *selDataObj) {
         node *root;
         searchStrBuf = (char *)malloc(100*sizeof(char));
         root = createTree(searchStrBuf);
-    } else {
-        for(int i = strlen(c)-1; i >=0; i--){
-            cin.putback(c[i]);
-        }
+        return root;
     }
 
-    return;
+    for(int i = strlen(c)-1; i >=0; i--){
+        cin.putback(c[i]);
+    }
+    // select statement without the where clause
+    return nullptr;
 }
