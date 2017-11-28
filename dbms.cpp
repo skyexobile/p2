@@ -24,9 +24,6 @@ using namespace std;
 #include<sstream>
 #include<algorithm>
 
-bool wayToSort( Tuple const& a, Tuple const& b) {
-  return a.getField("homework").integer < b.getField("homework").integer;
-}
 
 void appendTupleToRelation(Relation* relation_ptr, MainMemory& mem, int memory_block_index, Tuple& tuple) {
     Block* block_ptr;
@@ -136,6 +133,9 @@ int main() {
                                 selTuples.push_back(t);
                             }
                         }
+                        else{ // searchTreeRoot == nullptr : regular SELECT * FROM
+                            selTuples.push_back(t);
+                        }
                     }
                 }
                 copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
@@ -160,7 +160,6 @@ int main() {
                    if (tuple_schema.getFieldType(j)==INT){
                      field_types.push_back(INT);
                    }
-
                    else{
                    field_types.push_back(STR20);
                   }
@@ -168,46 +167,6 @@ int main() {
                 Schema selSchema(field_names,field_types);
                 Relation* relation_ptr=schema_manager.createRelation("selRelation",selSchema);
                 Tuple selTuple = relation_ptr->createTuple();
-
-                int numBlocks = tablePtrs[tName]->getNumOfBlocks();
-                //Read the blocks into memory 10 blocks at a time
-                for(int i = 0; i < numBlocks; i+=10){
-                  //bool Relation::getBlocks(int relation_block_index, int memory_block_index, int num_blocks)
-                    if (numBlocks-i >= 10) {
-                        tablePtrs[tName]->getBlocks(i,0,10);
-                    } else {
-                        tablePtrs[tName]->getBlocks(i,0,numBlocks-i);
-                    }
-                  cout << "Now the unsorted memory contains: " << endl;
-                  cout << mem << endl;
-                  // MainMemory::getTuples(int memory_block_begin,int num_blocks)
-                      //gets tuples from a range of blocks
-                  //Issue: blocks are not filling up when tuples are inserted
-                    //i.e., each block contains one tuple instead of 2
-                  //Sort the tuples in the 10 blocks
-                  vector<Tuple> sort_tuples = mem.getTuples(0, 10);
-                  //need to figure out what we're sorting by for wayToSort
-                  sort(sort_tuples.begin(), sort_tuples.end(), wayToSort);
-                  mem.setTuples(0,sort_tuples);
-                  cout << "Now the sorted memory contains: " << endl;
-                  cout << mem << endl;
-                  //Write the sublists back onto disk but make sure to store the starting index of the sublist
-                  //bool Relation::setBlocks(int relation_block_index, int memory_block_index, int num_blocks)
-                    if (numBlocks-i >= 10) {
-                        tablePtrs[tName]->setBlocks(i,0,10);
-                    } else {
-                        tablePtrs[tName]->setBlocks(i,0,numBlocks-i);
-                    }
-                  //Read the first block of each sublist into memory → getBlock()
-                  //Reading the i block of the relation into memory" << endl;
-                  for (int j = 0; j< tablePtrs[tName]->getNumOfBlocks(); j++){
-                  //tablePtrs[tName]->getBlock(i,j);
-                  }
-                  cout << *tablePtrs[tName] << endl;
-
-                  //Find the minimum among the smallest tuples in each sublist and output it → getTuples(), compare the smallest in each tuple vector using the compare function defined for sort.
-
-                }
 
                 for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
                     tablePtrs[tName]->getBlock(i,0);
@@ -225,6 +184,7 @@ int main() {
                                 string name = *t.getField(fieldName).str;
                                 selTuple.setField(fieldName, name);
                             }
+
                         }
                         // Evaluate selTuple based on the where clause and select it if it satisfies the condition
                         if (searchTreeRoot != nullptr) {
@@ -233,10 +193,14 @@ int main() {
                                 selTuples.push_back(selTuple);
                             }
                         }
+                        else{ //regular select from statement
+                           selTuples.push_back(selTuple);
+                        }
                     }
 
                 }
-                copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
+
+              copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
             }
 
         }
