@@ -4,9 +4,6 @@ bool wayToSort( Tuple const& a, Tuple const& b) {
 
 
 MainMemory mem;
-Disk disk;
-SchemaManager schema_manager(&mem,&disk);
-
 int numBlocks = tablePtrs[tName]->getNumOfBlocks();
 //Read the blocks into memory 10 blocks at a time
   // MainMemory::getTuples(int memory_block_begin,int num_blocks)
