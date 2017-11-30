@@ -3,6 +3,15 @@
 
 #include "stmtDataStructs.h"
 #include "parseTree.h"
+#include "Block.h"
+#include "Config.h"
+#include "Disk.h"
+#include "Field.h"
+#include "MainMemory.h"
+#include "Relation.h"
+#include "Schema.h"
+#include "SchemaManager.h"
+#include "Tuple.h"
 
 void tableName(char *tableNameBuf);
 void attrName(char *attrNameBuf);

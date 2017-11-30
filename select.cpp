@@ -2,11 +2,13 @@
 using namespace std;
 #include <cstdlib>
 #include <cstring>
+#include <string>
 #include "io.h"
 #include "stmtDataStructs.h"
 #include "common.h"
+#include "searchCondition.h"
+
 void selSublist(selectData *selDataObj);
-node *createTree(char *searchStrBuf);
 
 void tablelist(selectData *selDataObj){
   char *tableNameBuf = (char*)malloc(10*sizeof(char));
@@ -50,9 +52,9 @@ node* selectStmt(selectData *selDataObj) {
         tablelist(selDataObj);
         readWord(c);
         if(strcmp(c, "WHERE") == 0) {
-            char *searchStrBuf;
+            string searchStrBuf;
             node *root;
-            searchStrBuf = (char *)malloc(100*sizeof(char));
+            getline(cin, searchStrBuf);
             root = createTree(searchStrBuf);
             return root;
         }
@@ -81,9 +83,10 @@ node* selectStmt(selectData *selDataObj) {
     }
     readWord(c);
     if(strcmp(c, "WHERE") == 0) {
-        char *searchStrBuf;
+        string searchStrBuf;
         node *root;
-        searchStrBuf = (char *)malloc(100*sizeof(char));
+      //  searchStrBuf = (char *)malloc(100*sizeof(char));
+        getline(cin, searchStrBuf);
         root = createTree(searchStrBuf);
         return root;
     }

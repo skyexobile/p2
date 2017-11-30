@@ -1,33 +1,15 @@
-bool wayToSort( Tuple const& a, Tuple const& b) {
-  return a.getField("homework").integer < b.getField("homework").integer;
-}
+
+// Combining the tuples only based on names results in ambiguity when the tuples share attributes with the same name. Rather than trying to resolve this by modifying the field_names, it makes sense to just pass both the tuples (implicitly disambiguated) into the evaluate function.
+Let R be the smaller relation and S be the larger relation → getNumOfBlocks()
+Read 9 blocks of R and 1 block of S  into memory → getBlocks()
+For each block bR of R  // loop from 0 to numBlocks
+	For each tuple tR in bR  // iterate over getTuples()
+		For each tuple tS in bS  // getTuples()
+			If evalBool(tS, tR)
+				Combine tS and tR into tRes
+Output tRes
+
+#include "common.h"
+#include "searchCondition.h"
 
 
-MainMemory mem;
-int numBlocks = tablePtrs[tName]->getNumOfBlocks();
-//Read the blocks into memory 10 blocks at a time
-  // MainMemory::getTuples(int memory_block_begin,int num_blocks)
-      //gets tuples from a range of blocks
-  vector<Tuple> sort_tuples = mem.getTuples(0, 10);
-  //need to figure out what we're sorting by for wayToSort
-  sort(sort_tuples.begin(), sort_tuples.end(), wayToSort);
-  mem.setTuples(0,sort_tuples);
-  cout << "Now the sorted memory contains: " << endl;
-  cout << mem << endl;
-  //Write the sublists back onto disk but make sure to store the starting index of the sublist
-  //bool Relation::setBlocks(int relation_block_index, int memory_block_index, int num_blocks)
-    if (numBlocks-i >= 10) {
-        tablePtrs[tName]->setBlocks(i,0,10);
-    } else {
-        tablePtrs[tName]->setBlocks(i,0,numBlocks-i);
-    }
-  //Read the first block of each sublist into memory → getBlock()
-  //Reading the i block of the relation into memory" << endl;
-  for (int j = 0; j< tablePtrs[tName]->getNumOfBlocks(); j++){
-  //tablePtrs[tName]->getBlock(i,j);
-  }
-  cout << *tablePtrs[tName] << endl;
-
-  //Find the minimum among the smallest tuples in each sublist and output it → getTuples(), compare the smallest in each tuple vector using the compare function defined for sort.
-
-}

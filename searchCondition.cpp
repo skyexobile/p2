@@ -69,10 +69,9 @@ void recursiveSplit(node *parent, vector<string> const &tokens, string delimiter
     }
 }
 
-node *createTree(char *searchStrBuf) {
+node *createTree(const string& searchStrBuf) {
     string buf;
-    string str = searchStrBuf;
-    stringstream ss(str);
+    stringstream ss(searchStrBuf);
     vector<string> tokens;
     while(ss >> buf) {
         if ((buf != ")") && (buf != "(")) {
@@ -173,4 +172,12 @@ bool evalBool(node *root, Tuple selTuple) {
     }
 }
 
-
+/*
+int main() {
+    char *buf = (char *)malloc(100*sizeof(char));
+    node *root;
+    root = createTree(buf);
+    printTree(root, 0);
+    return 0;
+}
+*/   

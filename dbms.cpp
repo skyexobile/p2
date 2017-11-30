@@ -10,15 +10,6 @@ using namespace std;
 #include "parseTree.h"
 #include "stmtDataStructs.h"
 #include "searchCondition.h"
-#include "Block.h"
-#include "Config.h"
-#include "Disk.h"
-#include "Field.h"
-#include "MainMemory.h"
-#include "Relation.h"
-#include "Schema.h"
-#include "SchemaManager.h"
-#include "Tuple.h"
 #include <unordered_map>
 #include <iterator>
 #include<sstream>
@@ -121,6 +112,7 @@ int main() {
             if(readStar())
             {
                 searchTreeRoot = selectStmt(&selDataObj);
+                printTree(searchTreeRoot, 0);
                 string tName = selDataObj.relation_names[0]; // assuming selecting from single table
                 cout << "Table " << tName  << " contains: "<< endl;
                 for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
