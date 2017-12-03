@@ -76,5 +76,9 @@ class selectData{
         return out;
       }
 };
+class deleteData{
+public:
+  string relation_name;
+};
 
 #endif

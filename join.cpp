@@ -12,10 +12,10 @@ void join(Relation *join_relPtr, vector<string> relation_names, unordered_map<st
 
         for (int i = 0; i < numBlocks; i+=10) {
             //Read the blocks into memory 10 blocks at a time
-            int numBlksRead = (numBlocks-i >= 10) ? 10 : (numBlocks-i); 
+            int numBlksRead = (numBlocks-i >= 10) ? 10 : (numBlocks-i);
             tablePtrs[tName]->getBlocks(i,0,numBlksRead);
             vector<Tuple> tuplesInMem = mem.getTuples(0, numBlksRead);
-            relTuples[rel_index].insert(relTuples[rel_index].end(), 
+            relTuples[rel_index].insert(relTuples[rel_index].end(),
                     tuplesInMem.begin(), tuplesInMem.end());
         }
     }
@@ -23,24 +23,39 @@ void join(Relation *join_relPtr, vector<string> relation_names, unordered_map<st
     for (auto& t0:relTuples[0]) {
         // Add all the fields from t0 into t
         Tuple t = join_relPtr->createTuple();
-        concatenate(t, t0, 0); 
+        concatenate(t, t0, 0);
         // Combine each tuple in the second relation with t0
         for (auto& t1:relTuples[1]) {
             // Add all the fields from t1 into t
-            concatenate(t, t1, t0.getNumOfFields()); 
+            concatenate(t, t1, t0.getNumOfFields());
+
             if (numRelns > 2) {
                 for (auto& t2:relTuples[2]) {
                     // Add all the fields from t2 into t
-                    concatenate(t,t2,t0.getNumOfFields() + t1.getNumOfFields()); 
-                    if(evalBool(searchTree, t)) {
-                        t.printTuple();
+                    concatenate(t,t2,t0.getNumOfFields() + t1.getNumOfFields());
+                    if(searchTree->nodeType == " "){
+                      t.printTuple();
+
                     }
+                    else{
+                      if(evalBool(searchTree, t)) {
+                          t.printTuple();
+                      }
+                    }
+
                 }
             } else {
                 // Join of 2 relations
-                    if(evalBool(searchTree, t)) {
-                        t.printTuple();
+                    if(searchTree->nodeType == " "){
+                      t.printTuple();
+
                     }
+                    else{
+                      if(evalBool(searchTree, t)) {
+                          t.printTuple();
+                      }
+                    }
+
             }
         }
     }
