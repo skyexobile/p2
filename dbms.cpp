@@ -14,17 +14,15 @@ using namespace std;
 #include <iterator>
 #include<sstream>
 #include<algorithm>
+#include "join.h"
 
 
 void appendTupleToRelation(Relation* relation_ptr, MainMemory& mem, int memory_block_index, Tuple& tuple) {
     Block* block_ptr;
     block_ptr=mem.getBlock(memory_block_index);
     if (relation_ptr->getNumOfBlocks()!=0) {
-        cout << "The relation is not empty" << endl;
-        cout << "Read the last block of the relation into memory block 0:" << endl;
         relation_ptr->getBlock(relation_ptr->getNumOfBlocks()-1,memory_block_index);
         if (!block_ptr->isFull()) {
-            cout << "The block is not full" << endl;
             block_ptr->appendTuple(tuple); // append the tuple
             relation_ptr->setBlock(relation_ptr->getNumOfBlocks()-1,memory_block_index); //write back to the relation
             return;
@@ -33,7 +31,6 @@ void appendTupleToRelation(Relation* relation_ptr, MainMemory& mem, int memory_b
 
     block_ptr->clear();
     block_ptr->appendTuple(tuple); // append the tuple
-    cout << "Write to new block of the relation" << endl;
     relation_ptr->setBlock(relation_ptr->getNumOfBlocks(),memory_block_index); //write back to the relation
 }
 
@@ -68,15 +65,15 @@ int main() {
             }
         }
         else if(strcmp(stmtBuf, "DROP") == 0){
-          readWord(stmtBuf);
-          if (strcmp(stmtBuf, "TABLE") == 0){
-              char *tableNameBuf = (char *)malloc(10*sizeof(char));
-              tableName(tableNameBuf);
-              string relationName = string(tableNameBuf);
-              schema_manager.deleteRelation(relationName);
-              cout << "Dropped: "<< relationName << endl << "Current schema and relations:" << endl << schema_manager << endl;
+            readWord(stmtBuf);
+            if (strcmp(stmtBuf, "TABLE") == 0){
+                char *tableNameBuf = (char *)malloc(10*sizeof(char));
+                tableName(tableNameBuf);
+                string relationName = string(tableNameBuf);
+                schema_manager.deleteRelation(relationName);
+                cout << "Dropped: "<< relationName << endl << "Current schema and relations:" << endl << schema_manager << endl;
+            }
         }
-      }
         else if (strcmp(stmtBuf, "INSERT") == 0){
             readWord(stmtBuf);
             if (strcmp(stmtBuf, "INTO") == 0) {
@@ -98,8 +95,6 @@ int main() {
                 }
 
                 appendTupleToRelation(tablePtrs[inDataObj.relationName], mem, 0, tuple);
-                cout << "Now the memory contains: " << endl;
-                cout << mem << endl;
                 cout << "Now the relation contains: " << endl;
                 cout << *(tablePtrs[inDataObj.relationName]) << endl << endl;
                 //cout << "current schema and relations" << endl << schema_manager << endl;
@@ -109,52 +104,67 @@ int main() {
             selectData selDataObj;
             node *searchTreeRoot;
             vector<Tuple> selTuples;
+
             if(readStar())
             {
                 searchTreeRoot = selectStmt(&selDataObj);
-                printTree(searchTreeRoot, 0);
-                string tName = selDataObj.relation_names[0]; // assuming selecting from single table
-                cout << "Table " << tName  << " contains: "<< endl;
-                for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
-                    tablePtrs[tName]->getBlock(i,0);
-                    Block* block_ptr = mem.getBlock(0);
-                    vector<Tuple> tuples = block_ptr->getTuples();
-                    for (const auto& t:tuples) {
-                        if (searchTreeRoot != nullptr) {
-                            if(evalBool(searchTreeRoot->subTree[0], t)) {
-                                selTuples.push_back(t);
-                            }
-                        }
-                        else{ // searchTreeRoot == nullptr : regular SELECT * FROM
-                            selTuples.push_back(t);
-                        }
-                    }
+                if (searchTreeRoot != nullptr) {
+                    printTree(searchTreeRoot, 0);
                 }
-                copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
-                cout << endl;
-            }
-            else{
+                // One ration query, no need to prepend the relation name
+                string tName = selDataObj.relation_names[0]; // assuming selecting from single table
+                Schema schema = tablePtrs[tName]->getSchema();
+                selDataObj.column_names = schema.getFieldNames();                              
+            } else {
                 searchTreeRoot = selectStmt(&selDataObj);
+                if (searchTreeRoot != nullptr) {
+                    printTree(searchTreeRoot, 0);
+                }
+            }
+
+            if (selDataObj.relation_names.size() > 1) {
+                vector<string> newFldNames;
+                vector<enum FIELD_TYPE> newFldTypes;
+                string newTableName;
+                for (const string& tName:selDataObj.relation_names) {
+                    Relation *  relation_ptr = schema_manager.getRelation(tName);
+                    Schema schema =  relation_ptr->getSchema();
+                    vector<string> fieldNames= schema.getFieldNames();
+                    vector<enum FIELD_TYPE> fieldTypes = schema.getFieldTypes();
+                    // Prepend the relation name for every attribute name
+                    for (string& fldName:fieldNames) {
+                        fldName = tName +"."+ fldName;
+                    }
+                    // Create the schema for the combined tuple
+                    newFldNames.insert(newFldNames.end(), fieldNames.begin(), fieldNames.end());
+                    newFldTypes.insert(newFldTypes.end(), fieldTypes.begin(), fieldTypes.end());
+                    newTableName = newTableName + tName;
+                }
+
+                Schema joinSchema(newFldNames, newFldTypes);
+                Relation* relation_ptr=schema_manager.createRelation(newTableName,joinSchema);
+                join(relation_ptr, selDataObj.relation_names, tablePtrs, searchTreeRoot->subTree[0], mem, disk);
+
+            } else {
+
                 string tName = selDataObj.relation_names[0]; // assuming selecting from single table
                 cout << "Attributes selected: " << endl;
                 for (const auto& i:selDataObj.column_names) {
                     cout << i << '\t';
                 }
                 cout << endl;
-                Block* block_ptr = mem.getBlock(0);
-                vector<Tuple> tuples = block_ptr->getTuples();
-                Schema tuple_schema = tuples[0].getSchema();
+                Schema tuple_schema = tablePtrs[tName]->getSchema();
                 //Creating a schema
                 vector<string> field_names;
                 vector<enum FIELD_TYPE> field_types;
                 for (const auto& j:selDataObj.column_names) {
-                   field_names.push_back(j);
-                   if (tuple_schema.getFieldType(j)==INT){
-                     field_types.push_back(INT);
-                   }
-                   else{
-                   field_types.push_back(STR20);
-                  }
+                    field_names.push_back(j);
+                    if (tuple_schema.getFieldType(j)==INT){
+                        field_types.push_back(INT);
+                    }
+                    else{
+                        field_types.push_back(STR20);
+                    }
                 }
                 Schema selSchema(field_names,field_types);
                 Relation* relation_ptr=schema_manager.createRelation("selRelation",selSchema);
@@ -162,9 +172,10 @@ int main() {
 
                 for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
                     tablePtrs[tName]->getBlock(i,0);
-                    block_ptr = mem.getBlock(0);
-                    tuples = block_ptr->getTuples();
+                    Block *block_ptr = mem.getBlock(0);
+                    vector<Tuple> tuples = block_ptr->getTuples();
 
+                    // Get the required attributes from the tuple and create selTuple
                     for (const auto& t:tuples) {
                         for (const auto& j:selDataObj.column_names) {
                             string fieldName = j;
@@ -176,7 +187,6 @@ int main() {
                                 string name = *t.getField(fieldName).str;
                                 selTuple.setField(fieldName, name);
                             }
-
                         }
                         // Evaluate selTuple based on the where clause and select it if it satisfies the condition
                         if (searchTreeRoot != nullptr) {
@@ -185,18 +195,17 @@ int main() {
                                 selTuples.push_back(selTuple);
                             }
                         }
-                        else{ //regular select from statement
-                           selTuples.push_back(selTuple);
+                        else{ 
+                            //regular select from statement without WHERE
+                            selTuples.push_back(selTuple);
                         }
                     }
 
                 }
 
-              copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
+                copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
             }
-
         }
-        //sort
         readWord(stmtBuf);
     }
 }

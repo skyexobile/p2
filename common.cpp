@@ -8,11 +8,11 @@ using namespace std;
 #include "parseTree.h"
 #include "io.h"
 #include "stmtDataStructs.h"
-#define WIDTH 5
+#define WIDTH 15
 void tableName(char *tableNameBuf);
 
 void columnName(char* colNameBuf){
-    char *temp, *tableName, *attrName;
+    char *temp = (char *)malloc(20*sizeof(char)); 
     readWord(colNameBuf);
     if(readPeriod()){
       strcat(colNameBuf, ".");
