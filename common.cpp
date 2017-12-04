@@ -11,6 +11,10 @@ using namespace std;
 #define WIDTH 15
 void tableName(char *tableNameBuf);
 
+bool wayToSort( Tuple const& a, Tuple const& b) {
+  return a.getField(sortBy).integer < b.getField(sortBy).integer;
+}
+
 void columnName(char* colNameBuf){
     char *temp = (char *)malloc(20*sizeof(char)); 
     readWord(colNameBuf);

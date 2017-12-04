@@ -60,6 +60,7 @@ class selectData{
   public:
     vector<string> relation_names;
     vector<string> column_names;
+    string orderByCol;
     friend ostream& operator<< (ostream& out, const selectData& selDataObj) {
         out << "selDataObj" << endl;
         out << "relation_names: " << '\n';
@@ -71,8 +72,8 @@ class selectData{
         for (const auto& i:selDataObj.column_names) {
             out << i << '\t';
         }
-
         out << '\n';
+        out << "orderByCol: " << selDataObj.orderByCol << '\n';
         return out;
       }
 };

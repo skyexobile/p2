@@ -12,7 +12,11 @@
 #include "Schema.h"
 #include "SchemaManager.h"
 #include "Tuple.h"
+#include <unordered_map>
+#include <algorithm>
+using namespace std;
 
+bool wayToSort( Tuple const& a, Tuple const& b);
 void tableName(char *tableNameBuf);
 void attrName(char *attrNameBuf);
 void columnName(char* colNameBuf);
@@ -25,4 +29,6 @@ void booleanFactor(node* parent);
 void booleanTerm(node* parent);
 void searchCondition(node* parent);
 
+extern unordered_map<string, Relation *> tablePtrs;
+extern string sortBy;
 #endif

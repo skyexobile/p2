@@ -10,15 +10,18 @@ using namespace std;
 #include "parseTree.h"
 #include "stmtDataStructs.h"
 #include "searchCondition.h"
-#include <unordered_map>
 #include <iterator>
-#include<sstream>
-#include<algorithm>
+#include <sstream>
+#include <algorithm>
 #include "join.h"
 #include "delete.h"
 #include <ctime>
 #include <stdlib.h>
 #include "sorting.h"
+
+// Hash table made global since it is required in select.cpp, sorting.cpp and join.cpp
+unordered_map<string, Relation *> tablePtrs;
+string sortBy;
 void appendTupleToRelation(Relation* relation_ptr, MainMemory& mem, int memory_block_index, Tuple& tuple) {
     Block* block_ptr;
     block_ptr=mem.getBlock(memory_block_index);
@@ -42,16 +45,16 @@ int main() {
     MainMemory mem;
     Disk disk;
     SchemaManager schema_manager(&mem,&disk);
-
     disk.resetDiskIOs();
     disk.resetDiskTimer();
-    unordered_map<string, Relation *> tablePtrs;
 
     /* read the first word to check the type of statement */
     char *stmtBuf;
     stmtBuf= (char *)malloc(10*sizeof(char));
     readWord(stmtBuf);
+    int stmtCnt = 0;
     while(stmtBuf[0] != '0') {
+        cout << endl << ++stmtCnt << endl;
         /* call the corresponding subroutine */
 
         if (strcmp(stmtBuf, "CREATE") == 0){
@@ -73,7 +76,7 @@ int main() {
                 tableName(tableNameBuf);
                 string relationName = string(tableNameBuf);
                 schema_manager.deleteRelation(relationName);
-                cout << "Dropped: "<< relationName << endl << "Current schema and relations:" << endl << schema_manager << endl;
+                cout << "Dropped: "<< relationName << endl;
             }
         }
         else if (strcmp(stmtBuf, "INSERT") == 0){
@@ -106,28 +109,14 @@ int main() {
             selectData selDataObj;
             node *searchTreeRoot;
             vector<Tuple> selTuples;
-
-            if(readStar())
-            {
-                searchTreeRoot = selectStmt(&selDataObj);
-                if (searchTreeRoot != nullptr) {
-                    //printTree(searchTreeRoot, 0);
-                }
-                // One ration query, no need to prepend the relation name
-                string tName = selDataObj.relation_names[0]; // assuming selecting from single table
-                Schema schema = tablePtrs[tName]->getSchema();
-                selDataObj.column_names = schema.getFieldNames();
-            } else {
-                searchTreeRoot = selectStmt(&selDataObj);
-                if (searchTreeRoot != nullptr) {
-                    //printTree(searchTreeRoot, 0);
-                }
-            }
-
+            searchTreeRoot = selectStmt(&selDataObj);
+            cout << selDataObj << endl;
+            sortBy = selDataObj.orderByCol;
             if (selDataObj.relation_names.size() > 1) {
                 vector<string> newFldNames;
                 vector<enum FIELD_TYPE> newFldTypes;
                 string newTableName;
+                Relation *comb_relPtr = nullptr, *join_relPtr = nullptr;
                 int NJoinFlag;
                 vector<Tuple> lsortedTuples;
                 vector<Tuple> rsortedTuples;
@@ -143,55 +132,72 @@ int main() {
                     //check if we have to do a natural join
                     if (searchTreeRoot != nullptr) {
                         //printTree(searchTreeRoot, 0);
+/*
+                        node* current = searchTreeRoot;
+                        vector<node *> vectChildNodes;
+                        vectChildNodes = current->subTree;
+                        if(!vectChildNodes.empty()){
+                            for(auto & nodeptr: vectChildNodes){
+                                if(nodeptr->nodeType == "="){
+                                    string left = nodeptr->subTree[0]->nodeType;
+                                    string right = nodeptr->subTree[1]->nodeType;
+                                    size_t lPos = left.find(".");
+                                    size_t rPos = right.find(".");
 
-                    node* current = searchTreeRoot;
-                    vector<node *> vectChildNodes;
-                    vectChildNodes = current->subTree;
-                    if(!vectChildNodes.empty()){
-                      for(auto & nodeptr: vectChildNodes){
-                        if(nodeptr->nodeType == "="){
-                          string left = nodeptr->subTree[0]->nodeType;
-                          string right = nodeptr->subTree[1]->nodeType;
-                           size_t lPos = left.find(".");
-                           size_t rPos = right.find(".");
+                                    if(lPos!=std::string::npos && rPos != std::string::npos){
+                                        // can assume we have a natural join becauase both sides of = have a period
+                                        NJoinFlag = 1;
+                                        //sort this relation by substring after read Period
+                                        string lRelationName = left.substr(0,lPos);
+                                        string lsortBy = left.substr(lPos +1); // using + 1 otherwise period will be included in string
+                                        lsortedTuples = sortTuples(tablePtrs[lRelationName], lsortBy, mem, disk);
+                                        string rRelationName = right.substr(0,rPos);
+                                        string rsortBy = right.substr(rPos +1); // using + 1 otherwise period will be included in string
+                                        rsortedTuples = sortTuples(tablePtrs[rRelationName], rsortBy, mem, disk);
 
-                           if(lPos!=std::string::npos && rPos != std::string::npos){
-                             // can assume we have a natural join becauase both sides of = have a period
-                             NJoinFlag = 1;
-                             //sort this relation by substring after read Period
-                             string lRelationName = left.substr(0,lPos);
-                             string lsortBy = left.substr(lPos +1); // using + 1 otherwise period will be included in string
-                             lsortedTuples = sortTuples(tablePtrs[lRelationName], lsortBy, mem, disk);
-                             string rRelationName = right.substr(0,rPos);
-                             string rsortBy = right.substr(rPos +1); // using + 1 otherwise period will be included in string
-                             rsortedTuples = sortTuples(tablePtrs[rRelationName], rsortBy, mem, disk);
-
-                           }
-                         }
+                                    }
+                                }
+                            }
                         }
-                      }
+                        */
                     }
                     // Create the schema for the combined tuple
                     newFldNames.insert(newFldNames.end(), fieldNames.begin(), fieldNames.end());
                     newFldTypes.insert(newFldTypes.end(), fieldTypes.begin(), fieldTypes.end());
                     newTableName = newTableName + tName;
-
                 }
-                Schema joinSchema(newFldNames, newFldTypes);
 
-                Relation* relation_ptr=schema_manager.createRelation(newTableName,joinSchema);
-                if (searchTreeRoot == nullptr){
-                  //if we pass nullptr into join function, we'll seg fault
-                node *dummyNode;
-                dummyNode = new node(" ");
-                join(relation_ptr, selDataObj.relation_names, tablePtrs, dummyNode, mem, disk);
+                if (!selDataObj.column_names.empty()) {
+                    vector<string> joinFldNames;
+                    vector<enum FIELD_TYPE> joinFldTypes;
+                    for (auto fldName:selDataObj.column_names) {
+                        joinFldNames.push_back(fldName);
+                        int index = find(newFldNames.begin(), newFldNames.end(), fldName) - newFldNames.begin();
+                        joinFldTypes.push_back(newFldTypes[index]);
+                    }
+                    // Create the schema for the join tuple
+                    Schema joinSchema(joinFldNames, joinFldTypes);
+                    join_relPtr=schema_manager.createRelation("JoinRelation" ,joinSchema);
+                }
+                
+                Schema newSchema(newFldNames, newFldTypes);
 
-              }
-              else{
-                join(relation_ptr, selDataObj.relation_names, tablePtrs, searchTreeRoot->subTree[0], mem, disk);
-              }
+                comb_relPtr=schema_manager.createRelation(newTableName,newSchema);
+                node *searchTree = (searchTreeRoot == nullptr) ? nullptr : searchTreeRoot->subTree[0];
+                join(comb_relPtr, join_relPtr, selDataObj.relation_names, searchTree, mem, disk);
+                schema_manager.deleteRelation(newTableName);
+                if (join_relPtr != nullptr) {
+                    schema_manager.deleteRelation("JoinRelation");
+                }
 
             } else {
+                // Single relation SELECT query
+                if (selDataObj.column_names.empty()) {
+                    // One relation query, no need to prepend the relation name
+                    string tName = selDataObj.relation_names[0]; // assuming selecting from single table
+                    Schema schema = tablePtrs[tName]->getSchema();
+                    selDataObj.column_names = schema.getFieldNames();
+                }
 
                 string tName = selDataObj.relation_names[0]; // assuming selecting from single table
                 cout << "Attributes selected: " << endl;
@@ -228,36 +234,40 @@ int main() {
                     // Get the required attributes from the tuple and create selTuple
                     for (const auto& t:tuples) {
 
-                      if (!t.isNull()){ //for holes in relation after deletion
-                        for (const auto& j:selDataObj.column_names) {
-                            string fieldName = j;
-                            if (tuple_schema.getFieldType(j)==INT){
-                                int val = t.getField(fieldName).integer;
-                                selTuple.setField(fieldName,val);
+                        if (!t.isNull()){ //for holes in relation after deletion
+                            for (const auto& j:selDataObj.column_names) {
+                                string fieldName = j;
+                                if (tuple_schema.getFieldType(j)==INT){
+                                    int val = t.getField(fieldName).integer;
+                                    selTuple.setField(fieldName,val);
 
+                                }
+                                else{
+                                    string name = *t.getField(fieldName).str;
+                                    selTuple.setField(fieldName, name);
+                                }
+                            }
+                            // Evaluate selTuple based on the where clause and select it if it satisfies the condition
+                            if (searchTreeRoot != nullptr) {
+                                // where clause in the statement
+                                if (evalBool(searchTreeRoot->subTree[0], t)) {
+                                    selTuples.push_back(selTuple);
+                                }
                             }
                             else{
-                                string name = *t.getField(fieldName).str;
-                                selTuple.setField(fieldName, name);
-                            }
-                        }
-                        // Evaluate selTuple based on the where clause and select it if it satisfies the condition
-                        if (searchTreeRoot != nullptr) {
-                            // where clause in the statement
-                            if (evalBool(searchTreeRoot->subTree[0], t)) {
+                                //regular select from statement without WHERE
                                 selTuples.push_back(selTuple);
                             }
                         }
-                        else{
-                            //regular select from statement without WHERE
-                            selTuples.push_back(selTuple);
-                        }
-                      }
                     }
 
                 }
 
+                if (!selDataObj.orderByCol.empty()) {
+                    sort(selTuples.begin(), selTuples.end(), wayToSort);
+                }
                 copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
+                cout << endl;
             }
         }
         else if (strcmp(stmtBuf, "DELETE") == 0) {

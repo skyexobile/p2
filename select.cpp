@@ -21,7 +21,6 @@ void tablelist(selectData *selDataObj){
   return;
 }
 
-
 void selSublist(selectData *selDataObj) {
   char *colNameBuf;
   colNameBuf = (char *)malloc(20*sizeof(char));
@@ -38,34 +37,17 @@ void selSublist(selectData *selDataObj) {
 
 void selList(selectData *selDataObj) {
   //check for star, otherwise select-sublist
+  if (readStar()) {
+      return;
+  }
     selSublist(selDataObj);
-
     return;
-
 }
 
 node* selectStmt(selectData *selDataObj) {
-    char* c= (char *)malloc(10*sizeof(char));
+    char* c= (char *)malloc(20*sizeof(char));
+    node* root=nullptr;
     readWord(c);
-    //for SELECT *, next word will be FROM
-    if(strcmp(c, "FROM") ==0){
-        tablelist(selDataObj);
-        readWord(c);
-        if(strcmp(c, "WHERE") == 0) {
-            string searchStrBuf;
-            node *root;
-            getline(cin, searchStrBuf);
-            root = createTree(searchStrBuf);
-            return root;
-        }
-        for(int i = strlen(c)-1; i >=0; i--){
-            cin.putback(c[i]);
-        }
-        // select statement without the where clause
-        return nullptr;
-    }
-
-    // We don't have a star
     if(strcmp(c, "DISTINCT")==0){
         //something special for distinct
     }
@@ -84,16 +66,32 @@ node* selectStmt(selectData *selDataObj) {
     readWord(c);
     if(strcmp(c, "WHERE") == 0) {
         string searchStrBuf;
-        node *root;
-      //  searchStrBuf = (char *)malloc(100*sizeof(char));
         getline(cin, searchStrBuf);
         root = createTree(searchStrBuf);
+    } else if(strcmp(c, "ORDER") == 0) {
+        readWord(c);
+        if(strcmp(c, "BY") == 0) {
+            readWord(c);
+            selDataObj->orderByCol = c;
+        }
+        return root;
+    } else {
+        for(int i = strlen(c)-1; i >=0; i--){
+            cin.putback(c[i]);
+        }
         return root;
     }
 
+    readWord(c);
+    if(strcmp(c, "ORDER") == 0) {
+        readWord(c);
+        if(strcmp(c, "BY") == 0) {
+            readWord(c);
+            selDataObj->orderByCol = c;
+        }
+        return root;
+    }
     for(int i = strlen(c)-1; i >=0; i--){
         cin.putback(c[i]);
     }
-    // select statement without the where clause
-    return nullptr;
 }
