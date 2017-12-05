@@ -101,7 +101,6 @@ void join(Relation *comb_relPtr, Relation *join_relPtr, vector<string> relation_
             }
         }
     }
-    sort(selTuples.begin(), selTuples.end(), wayToSort);
     cout << "Attributes Selected" << endl;
     Schema schema = join_relPtr ? join_relPtr->getSchema() : comb_relPtr->getSchema();
     for (auto fldName:schema.getFieldNames()) {

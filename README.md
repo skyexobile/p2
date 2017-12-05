@@ -1,5 +1,6 @@
-Tutorial on git:
-https://www.atlassian.com/git/tutorials/setting-up-a-repository
+To compile, execute:
+g++ -o dbms -g -std=c++11 dbms.cpp io.cpp common.cpp createTable.cpp StorageManager.cpp insert.cpp select.cpp searchCondition.cpp join.cpp delete.cpp sorting.cpp
 
-For this project, you may want to pull or clone the repository, make a new branch for your own changes, then eventually merge
-with master branch
+To run the testcases from file:
+./dbms < textfile
+

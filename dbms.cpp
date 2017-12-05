@@ -110,12 +110,6 @@ int main() {
             node *searchTreeRoot = nullptr;
             vector<Tuple> selTuples;
             searchTreeRoot = selectStmt(&selDataObj);
-            cout << selDataObj << endl;
-            if (searchTreeRoot != nullptr) {
-                printTree(searchTreeRoot, 0);
-            } else {
-                cout << "no where clause" << endl;
-            }
             if (!selDataObj.orderByCol.empty()) {
                 sortBy = selDataObj.orderByCol;
             }
