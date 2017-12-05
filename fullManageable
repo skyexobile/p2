@@ -76,6 +76,8 @@ INSERT INTO course (sid, homework, project, exam, grade) VALUES (16, 0, 0, 0, "E
 INSERT INTO course (sid, homework, project, exam, grade) VALUES (17, 100, 100, 100, "A")
 SELECT * FROM course
 SELECT sid, grade FROM course
+SELECT sid, course.grade FROM course
+SELECT * FROM course ORDER BY exam
 SELECT * FROM course WHERE exam = 100
 SELECT * FROM course WHERE grade = "A"
 SELECT * FROM course WHERE exam = 100 AND project = 100
