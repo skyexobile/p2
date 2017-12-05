@@ -74,6 +74,9 @@ node *createTree(const string& searchStrBuf) {
     stringstream ss(searchStrBuf);
     vector<string> tokens;
     while(ss >> buf) {
+        if (buf == "ORDER") {
+            break;
+        }
         if ((buf != ")") && (buf != "(")) {
             tokens.push_back(buf);
         }
