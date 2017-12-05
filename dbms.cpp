@@ -45,8 +45,6 @@ int main() {
     MainMemory mem;
     Disk disk;
     SchemaManager schema_manager(&mem,&disk);
-    disk.resetDiskIOs();
-    disk.resetDiskTimer();
 
     /* read the first word to check the type of statement */
     char *stmtBuf;
@@ -54,6 +52,8 @@ int main() {
     readWord(stmtBuf);
     int stmtCnt = 0;
     while(stmtBuf[0] != '0') {
+        disk.resetDiskIOs();
+        disk.resetDiskTimer();
         cout << endl << ++stmtCnt << endl;
         /* call the corresponding subroutine */
 
@@ -111,6 +111,11 @@ int main() {
             vector<Tuple> selTuples;
             searchTreeRoot = selectStmt(&selDataObj);
             cout << selDataObj << endl;
+            if (searchTreeRoot != nullptr) {
+                printTree(searchTreeRoot, 0);
+            } else {
+                cout << "no where clause" << endl;
+            }
             if (!selDataObj.orderByCol.empty()) {
                 sortBy = selDataObj.orderByCol;
             }
@@ -313,6 +318,7 @@ int main() {
                 tablePtrs[tName]->deleteBlocks(0);
             }
         }
+        cout << "#Disk I/Os = " << disk.getDiskIOs() << endl;
         readWord(stmtBuf);
     }
 }

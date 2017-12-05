@@ -102,6 +102,12 @@ void join(Relation *comb_relPtr, Relation *join_relPtr, vector<string> relation_
         }
     }
     sort(selTuples.begin(), selTuples.end(), wayToSort);
+    cout << "Attributes Selected" << endl;
+    Schema schema = join_relPtr ? join_relPtr->getSchema() : comb_relPtr->getSchema();
+    for (auto fldName:schema.getFieldNames()) {
+        cout << fldName << '\t';
+    }
+    cout << endl;
     copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
     cout << endl;
 
@@ -119,7 +125,7 @@ void concatenate(Tuple& combTuple, const Tuple& relTuple, int offset) {
 
 void collectTuple(Tuple& combTuple, Relation *join_relPtr, vector<Tuple>& selTuples) {
     if (join_relPtr == nullptr) {
-        combTuple.printTuple();
+        selTuples.push_back(combTuple);
     } else {
         Tuple joinTuple = join_relPtr->createTuple();
     for (auto fldName: joinTuple.getSchema().getFieldNames()) {

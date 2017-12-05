@@ -66,13 +66,28 @@ node* selectStmt(selectData *selDataObj) {
     readWord(c);
     if(strcmp(c, "WHERE") == 0) {
         string searchStrBuf;
-        getline(cin, searchStrBuf);
+        char p;
+        cin.get(p);
+        while (p != 'E' && p != '\n') {
+            searchStrBuf.push_back(p);
+            cin.get(p);
+        }
+        cin.putback(p);
+        if (p == 'E') {
+            cin.putback('D');
+            cin.putback('R');
+            cin.putback('O');
+        }
         root = createTree(searchStrBuf);
     } else if(strcmp(c, "ORDER") == 0) {
         readWord(c);
         if(strcmp(c, "BY") == 0) {
             readWord(c);
             selDataObj->orderByCol = c;
+            if (readPeriod()) {
+                readWord(c);
+                selDataObj->orderByCol = selDataObj->orderByCol + "." + c;
+            }
         }
         return root;
     } else {
@@ -88,6 +103,10 @@ node* selectStmt(selectData *selDataObj) {
         if(strcmp(c, "BY") == 0) {
             readWord(c);
             selDataObj->orderByCol = c;
+            if (readPeriod()) {
+                readWord(c);
+                selDataObj->orderByCol = selDataObj->orderByCol + "." + c;
+            }
         }
         return root;
     }
