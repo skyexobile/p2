@@ -2,6 +2,60 @@
 #include "searchCondition.h"
 #include <iterator>
 #include "join.h"
+#include "sorting.h"
+
+void natJoin(Relation *comb_relPtr, Relation *join_relPtr, vector<string> nJoinRelNames, vector<string> nJoinAttrs, node *searchTree, MainMemory& mem, Disk& disk) {
+    // Call the sort functions to read the disk and get the tuples in sorted order
+    vector<Tuple> selTuples;
+    vector<Tuple> rel1Sorted = sortTuples(tablePtrs[nJoinRelNames[0]], nJoinAttrs[0], mem, disk);
+    vector<Tuple> rel2Sorted = sortTuples(tablePtrs[nJoinRelNames[1]], nJoinAttrs[1], mem, disk);
+
+    auto it1 = rel1Sorted.begin();
+    auto it2 = rel2Sorted.begin();
+    if ((*it1).getSchema().getFieldType(nJoinAttrs[0])==INT) {
+        while(it1 != rel1Sorted.end() && it2 != rel2Sorted.end()) {
+            int valRel1, valRel2;
+            valRel1 = (*it1).getField(nJoinAttrs[0]).integer;
+            valRel2 = (*it2).getField(nJoinAttrs[1]).integer;
+            if (valRel1 == valRel2) {
+                Tuple t = comb_relPtr->createTuple();
+                concatenate(t, *it1, 0);
+                concatenate(t, *it2, (*it1).getNumOfFields());
+                if(!searchTree || evalBool(searchTree, t)) {
+                    collectTuple(t,join_relPtr, selTuples);
+                }
+                it1++;
+                it2++;
+            } else if (valRel1 < valRel2) {
+                it1++;
+            } else {
+                it2++;
+            }
+        }
+    } else {
+
+        while(it1 != rel1Sorted.end() && it2 != rel2Sorted.end()) {
+            string valRel1, valRel2;
+            valRel1 = *(*it1).getField(nJoinAttrs[0]).str;
+            valRel2 = *(*it2).getField(nJoinAttrs[1]).str;
+            if (valRel1 == valRel2) {
+                Tuple t = comb_relPtr->createTuple();
+                concatenate(t, *it1, 0);
+                concatenate(t, *it2, (*it1).getNumOfFields());
+                if(!searchTree || evalBool(searchTree, t)) {
+                    collectTuple(t,join_relPtr, selTuples);
+                }
+            } else if (valRel1 < valRel2) {
+                it1++;
+            } else {
+                it2++;
+            }
+        }
+    }
+    copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
+    cout << endl;
+}
+
 
 void join(Relation *comb_relPtr, Relation *join_relPtr, vector<string> relation_names, node *searchTree, MainMemory& mem, Disk& disk) {
     int numRelns = relation_names.size();
@@ -49,6 +103,7 @@ void join(Relation *comb_relPtr, Relation *join_relPtr, vector<string> relation_
     }
     sort(selTuples.begin(), selTuples.end(), wayToSort);
     copy(selTuples.begin(),selTuples.end(),ostream_iterator<Tuple,char>(cout,"\n"));
+    cout << endl;
 
 }
 

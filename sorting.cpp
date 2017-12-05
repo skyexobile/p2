@@ -1,10 +1,15 @@
 #include "sorting.h"
 #include "common.h"
 #include "Tuple.h"
+#include <string>
 using namespace std;
-static string sortBy;
+extern string sortBy;
 bool wayToSort( Tuple const& a, Tuple const& b) {
-  return a.getField(sortBy).integer < b.getField(sortBy).integer;
+    if (a.getSchema().getFieldType(sortBy) == INT) {
+        return a.getField(sortBy).integer < b.getField(sortBy).integer;
+    } else {
+        return *a.getField(sortBy).str < *b.getField(sortBy).str;
+    }
 }
 
 vector<Tuple> sortTuples(Relation *sort_relPtr,string sortByVal, MainMemory& mem, Disk& disk) {

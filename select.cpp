@@ -94,4 +94,5 @@ node* selectStmt(selectData *selDataObj) {
     for(int i = strlen(c)-1; i >=0; i--){
         cin.putback(c[i]);
     }
+    return root;
 }

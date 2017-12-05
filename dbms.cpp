@@ -107,19 +107,59 @@ int main() {
             }
         } else if (strcmp(stmtBuf, "SELECT") == 0) {
             selectData selDataObj;
-            node *searchTreeRoot;
+            node *searchTreeRoot = nullptr;
             vector<Tuple> selTuples;
             searchTreeRoot = selectStmt(&selDataObj);
             cout << selDataObj << endl;
-            sortBy = selDataObj.orderByCol;
+            if (!selDataObj.orderByCol.empty()) {
+                sortBy = selDataObj.orderByCol;
+            }
             if (selDataObj.relation_names.size() > 1) {
                 vector<string> newFldNames;
                 vector<enum FIELD_TYPE> newFldTypes;
                 string newTableName;
+                bool nJoinFlg = false;
+                vector<string> nJoinRelNames, nJoinAttrs;
                 Relation *comb_relPtr = nullptr, *join_relPtr = nullptr;
-                int NJoinFlag;
                 vector<Tuple> lsortedTuples;
                 vector<Tuple> rsortedTuples;
+                //check if we have to do a natural join
+                if ((selDataObj.relation_names.size() == 2) && (searchTreeRoot != nullptr)) {
+                    bool flgCont = true;
+                    vector<node *> vectChildNodes;
+                    vectChildNodes = searchTreeRoot->subTree;
+                    while(flgCont) {
+                        for(auto & nodeptr: vectChildNodes){
+                            // Check all the children of the searchTreeRoot or the AND node to check if there is an equality between 2 attributes
+                            if(nodeptr->nodeType == "="){
+                                // nodeType is the name of the attribute in case of an attribute name
+                                string left = nodeptr->subTree[0]->nodeType;
+                                string right = nodeptr->subTree[1]->nodeType;
+                                size_t lPos = left.find(".");
+                                size_t rPos = right.find(".");
+                                if (lPos != left.npos && rPos != right.npos) {
+                                    nJoinFlg = true;
+                                    nJoinRelNames.push_back(left.substr(0,lPos));
+                                    nJoinRelNames.push_back(right.substr(0,rPos));
+                                    nJoinAttrs.push_back(left.substr(lPos+1));
+                                    nJoinAttrs.push_back(right.substr(rPos+1));
+                                    break;
+                                } 
+                            }
+                        }
+                        for(auto & nodeptr: vectChildNodes){
+                            if(!nJoinFlg && nodeptr->nodeType == "AND"){
+                                vectChildNodes = nodeptr->subTree;
+                                flgCont = true;
+                                break;
+                            }
+                            else {
+                                flgCont = false;
+                            }
+                        }
+                    }
+                }
+
                 for (const string& tName:selDataObj.relation_names) {
                     Relation *  relation_ptr = schema_manager.getRelation(tName);
                     Schema schema =  relation_ptr->getSchema();
@@ -129,38 +169,7 @@ int main() {
                     for (string& fldName:fieldNames) {
                         fldName = tName +"."+ fldName;
                     }
-                    //check if we have to do a natural join
-                    if (searchTreeRoot != nullptr) {
-                        //printTree(searchTreeRoot, 0);
-/*
-                        node* current = searchTreeRoot;
-                        vector<node *> vectChildNodes;
-                        vectChildNodes = current->subTree;
-                        if(!vectChildNodes.empty()){
-                            for(auto & nodeptr: vectChildNodes){
-                                if(nodeptr->nodeType == "="){
-                                    string left = nodeptr->subTree[0]->nodeType;
-                                    string right = nodeptr->subTree[1]->nodeType;
-                                    size_t lPos = left.find(".");
-                                    size_t rPos = right.find(".");
 
-                                    if(lPos!=std::string::npos && rPos != std::string::npos){
-                                        // can assume we have a natural join becauase both sides of = have a period
-                                        NJoinFlag = 1;
-                                        //sort this relation by substring after read Period
-                                        string lRelationName = left.substr(0,lPos);
-                                        string lsortBy = left.substr(lPos +1); // using + 1 otherwise period will be included in string
-                                        lsortedTuples = sortTuples(tablePtrs[lRelationName], lsortBy, mem, disk);
-                                        string rRelationName = right.substr(0,rPos);
-                                        string rsortBy = right.substr(rPos +1); // using + 1 otherwise period will be included in string
-                                        rsortedTuples = sortTuples(tablePtrs[rRelationName], rsortBy, mem, disk);
-
-                                    }
-                                }
-                            }
-                        }
-                        */
-                    }
                     // Create the schema for the combined tuple
                     newFldNames.insert(newFldNames.end(), fieldNames.begin(), fieldNames.end());
                     newFldTypes.insert(newFldTypes.end(), fieldTypes.begin(), fieldTypes.end());
@@ -179,12 +188,17 @@ int main() {
                     Schema joinSchema(joinFldNames, joinFldTypes);
                     join_relPtr=schema_manager.createRelation("JoinRelation" ,joinSchema);
                 }
-                
+
                 Schema newSchema(newFldNames, newFldTypes);
 
                 comb_relPtr=schema_manager.createRelation(newTableName,newSchema);
                 node *searchTree = (searchTreeRoot == nullptr) ? nullptr : searchTreeRoot->subTree[0];
-                join(comb_relPtr, join_relPtr, selDataObj.relation_names, searchTree, mem, disk);
+                if (nJoinFlg) {
+                    // Only possible when we have 2 relations and nat join conditions are satisfied
+                    natJoin(comb_relPtr, join_relPtr, nJoinRelNames, nJoinAttrs, searchTree, mem, disk);
+                } else {
+                    join(comb_relPtr, join_relPtr, selDataObj.relation_names, searchTree, mem, disk);
+                }
                 schema_manager.deleteRelation(newTableName);
                 if (join_relPtr != nullptr) {
                     schema_manager.deleteRelation("JoinRelation");
@@ -271,34 +285,34 @@ int main() {
             }
         }
         else if (strcmp(stmtBuf, "DELETE") == 0) {
-              deleteData delDataObj;
-              node *del_searchTreeRoot;
-              del_searchTreeRoot = deleteStmt(&delDataObj);
-              string tName = delDataObj.relation_name;
-              if (del_searchTreeRoot != nullptr) {
-                  //printTree(del_searchTreeRoot, 0);
-                  //go through every tuple in relation that satisfies evalbool searchCondition
-                 // read tuple into memory, set it to nullTuple(), which invalidates all tuples in that block
-                 // write memory block back to disk back to ith block of the relation
-                 for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
-                     tablePtrs[tName]->getBlock(i,0);
-                     Block *block_ptr = mem.getBlock(0);
-                     int numTuples = block_ptr->getNumTuples();
-                     for(int offset = 0; offset < numTuples; offset++){
-                       Tuple t = block_ptr->getTuple(offset);
-                       if(evalBool(del_searchTreeRoot->subTree[0], t)){
-                         block_ptr->nullTuple(offset);
-                         tablePtrs[tName]->setBlock(i,0);
-                       }
+            deleteData delDataObj;
+            node *del_searchTreeRoot;
+            del_searchTreeRoot = deleteStmt(&delDataObj);
+            string tName = delDataObj.relation_name;
+            if (del_searchTreeRoot != nullptr) {
+                //printTree(del_searchTreeRoot, 0);
+                //go through every tuple in relation that satisfies evalbool searchCondition
+                // read tuple into memory, set it to nullTuple(), which invalidates all tuples in that block
+                // write memory block back to disk back to ith block of the relation
+                for(int i = 0; i< (tablePtrs[tName]->getNumOfBlocks());i++){
+                    tablePtrs[tName]->getBlock(i,0);
+                    Block *block_ptr = mem.getBlock(0);
+                    int numTuples = block_ptr->getNumTuples();
+                    for(int offset = 0; offset < numTuples; offset++){
+                        Tuple t = block_ptr->getTuple(offset);
+                        if(evalBool(del_searchTreeRoot->subTree[0], t)){
+                            block_ptr->nullTuple(offset);
+                            tablePtrs[tName]->setBlock(i,0);
+                        }
 
-                     }
+                    }
                 }
-              }
-              else{//delete from everything
-                //delete the block from [starting_block_index] to the last block
-                  tablePtrs[tName]->deleteBlocks(0);
-              }
             }
+            else{//delete from everything
+                //delete the block from [starting_block_index] to the last block
+                tablePtrs[tName]->deleteBlocks(0);
+            }
+        }
         readWord(stmtBuf);
     }
 }
